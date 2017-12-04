@@ -1,0 +1,23 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/layout :: headerFragment">
+    <title id="pageTitle">Delete</title>
+</head>
+<body class="container">
+<header th:include="fragments/header :: headerFragment">
+</header>
+
+<main class="container">
+    <h4 th:utext="'Are you sure to delete: <code>' + ${entity.name} + '</code>?'"></h4>
+
+    <form>
+        <input th:value="${entity.id}" name="id" type="hidden"/>
+        <input type="submit" th:formmethod="post" th:formaction="'../rm/' + ${entity.id}"
+               value="Yes" class="btn btn-danger"/>
+        <input type="submit" th:formaction="'../'" value="No" class="btn btn-info"/>
+    </form>
+</main>
+
+<footer th:include="fragments/footer :: footerFragment">
+</footer>
+</body>
+</html>

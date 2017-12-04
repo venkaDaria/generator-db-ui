@@ -1,0 +1,32 @@
+@import 'colors';
+
+$margin-left: 200px;
+$margin-left-collapsed: 60px;
+
+h1, h2 {
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+header {
+  h1 {
+    text-transform: uppercase;
+  }
+
+  small {
+    text-transform: none;
+    color: $second-text-color;
+    font-size: 50%;
+  }
+}
+
+i.wizard-icon {
+  font-family: FontAwesome, sans-serif
+}

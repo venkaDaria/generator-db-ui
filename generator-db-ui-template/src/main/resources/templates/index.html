@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/layout :: headerFragment">
+    <title id="pageTitle" th:text="${title}"></title>
+</head>
+
+<body class="container">
+    <header th:include="fragments/header :: headerFragment">
+    </header>
+
+    <main class="container">
+        <div class="list-group">
+            <a th:each="path : ${paths}" th:href="${path.href}" th:text="${path.name}" class="list-group-item"></a>
+        </div>
+    </main>
+
+    <footer th:include="fragments/footer :: footerFragment">
+    </footer>
+</body>
+</html>

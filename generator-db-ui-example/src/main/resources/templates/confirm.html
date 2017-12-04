@@ -1,0 +1,25 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/layout :: headerFragment">
+    <title id="pageTitle">Delete</title>
+</head>
+<body class="container">
+<header>
+    <h1>Oracle DB</h1>
+</header>
+
+<main class="container">
+    <h4 th:utext="'Are you sure to delete: <code>' + ${entity.name} + '</code>?'"></h4>
+
+    <form>
+        <input th:value="${entity.id}" name="id" type="hidden"/>
+        <input type="submit" th:formmethod="post" th:formaction="'../rm/' + ${entity.id}"
+               value="Yes" class="btn btn-danger"/>
+        <input type="submit" th:formaction="'../'" value="No" class="btn btn-info"/>
+    </form>
+</main>
+
+<footer>
+    © Daria Pydorenko, 2017
+</footer>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/layout :: headerFragment">
+    <title id="pageTitle">Oracle DB</title>
+</head>
+
+<body class="container">
+    <header>
+        <h1>Oracle DB</h1>
+    </header>
+
+    <main class="container">
+        <div class="list-group">
+            <a th:href="'/artist/'" class="list-group-item">Artists</a>
+            <a th:href="'/painting/'" class="list-group-item">Paintings</a>
+            <a th:href="'/gallery/'" class="list-group-item">Galleries</a>
+            <a th:href="'/exhibition/'" class="list-group-item">Exhibitions</a>
+        </div>
+    </main>
+
+    <footer>
+        © Daria Pydorenko, 2017
+    </footer>
+</body>
+</html>

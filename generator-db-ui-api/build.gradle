@@ -1,0 +1,13 @@
+group 'com.example.venka'
+
+dependencies {
+    compile group: 'com.google.code.gson', name: 'gson'
+    compile group: 'com.sparkjava', name: 'spark-core'
+
+    compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: "${springBootVersion}"
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.18'
+}

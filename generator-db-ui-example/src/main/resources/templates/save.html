@@ -1,0 +1,71 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/layout :: headerFragment">
+    <title id="pageTitle">Add | Edit</title>
+</head>
+<body class="container">
+<header>
+    <h1>Oracle DB</h1>
+</header>
+
+<main class="container">
+    <form th:action="${entity == null ? './' : '../' + entity.id}" method="post">
+        <fieldset>
+            <legend th:text="${entity} ? 'Edit ' : 'Add'"></legend>
+
+            <div th:if="${entity}">
+                <h4><span th:text="${entity.id}" class="label label-default"></span></h4>
+                <input name="id" hidden th:value="${entity.id}" title="id"/>
+            </div>
+
+            <th:block th:each="header : ${headers}">
+                <label th:for="${header.getName()}" th:text="${header.getName()}"></label>
+
+                <div th:if="${header.getType().getSimpleName()} == 'String'">
+                    <input th:id="${header.getName()}" th:name="${header.getName()}" class="form-control"
+                           th:value="${entity?.getFieldValue(header)}" />
+                </div>
+
+                <div th:if="${header.getType().getSimpleName()} == 'LocalDate'">
+                    <input type="date" th:id="${header.getName()}" th:name="${header.getName()}" class="form-control"
+                           th:value="${entity?.getFieldValue(header)}"
+                           min="1000-01-01" max="2017-12-01"/>
+                </div>
+
+                <div th:if="${header.getType().getSuperclass() != null &&
+                        header.getType().getSuperclass().getSimpleName() == 'BaseEntity'}">
+                    <select th:name="${header.getName()}" th:if="${choices.get(header.getName()).size()} > 0">
+                        <option th:each="choice : ${choices.get(header.getName())}"
+                                th:selected="${entity?.getFieldValue(header)} == choice"
+                                th:value="${choice.id}"
+                                th:text="${choice.name}">
+                        </option>
+                    </select>
+                </div>
+
+                <div th:if="${header.getType().getSimpleName()} == 'Set'">
+                    <select multiple th:name="${header.getName()}" th:if="${choices.get(header.getName()).size()} > 0">
+                        <option th:each="choice : ${choices.get(header.getName())}"
+                                th:selected="${entity?.isSelected(header, choice)}"
+                                th:value="${choice.id}"
+                                th:text="${choice.name}">
+                        </option>
+                    </select>
+                </div>
+                <br/>
+            </th:block>
+
+            <br/>
+            <input type="submit" class="btn btn-success" th:value="${entity} ? 'Save' : 'Add'"/>
+        </fieldset>
+    </form>
+
+    <div>
+        <a th:href="${entity == null ? './' : '../'}">Return</a>
+    </div>
+</main>
+
+<footer>
+    © Daria Pydorenko, 2017
+</footer>
+</body>
+</html>

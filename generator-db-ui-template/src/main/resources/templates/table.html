@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/layout :: headerFragment">
+    <title id="pageTitle">Show Table</title>
+</head>
+
+<body class="container">
+<header th:include="fragments/header :: headerFragment">
+</header>
+
+<main class="container">
+    <table class="table table-bordered table-hover"
+           th:include="fragments/table_fragment :: tableFragment">
+    </table>
+
+    <form th:action="'save'">
+            <input type="submit" value="Add" class="btn btn-info"/>
+    </form>
+
+    <div>
+        <a href="/">Return</a>
+    </div>
+
+    <div th:if="${isOkay}" th:text="'<strong>Success!</strong> ' + isOkay" class="alert alert-success">
+    </div>
+</main>
+
+<footer th:include="fragments/footer :: footerFragment">
+</footer>
+</body>
+</html>

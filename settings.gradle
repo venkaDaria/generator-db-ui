@@ -1,0 +1,4 @@
+rootProject.name = 'generator-db-ui'
+include 'generator-db-ui-api'
+include 'generator-db-ui-example'
+
