@@ -35,7 +35,6 @@
         },
         methods: {
             validateStep(name) {
-                console.log(this.$refs[name]);
                 return this.$refs[name].validate();
             },
             mergePartialModels(model, isValid){

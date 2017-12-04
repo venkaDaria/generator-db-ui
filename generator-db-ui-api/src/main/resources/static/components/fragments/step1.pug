@@ -7,19 +7,24 @@ h2
 .col-sm-12.col-md-6
     h2 Project Metadata
         p Artifact coordinates
-        .form-group.groupid-form-group
+        .form-group(v-bind:class="{ 'has-error': $v.groupId.$error }")
             label.control-label(for='groupId') Group
-            input#groupId.form-control(tabindex='4', type='text', value='com.example', name='groupId')
-        .form-group.artifactid-form-group
+            input#groupId.form-control(tabindex='4', type='text', value='com.example',
+                name='groupId', v-model.trim='groupId', @input='$v.groupId.$touch()')
+            span.help-block(v-if='$v.groupId.$error && !$v.groupId.required') groupId is required
+        .form-group(v-bind:class="{ 'has-error': $v.artifactId.$error }")
             label.control-label(for='artifactId') Artifact
-            input#artifactId.form-control(tabindex='5', type='text', value='demo', name='artifactId')
-        .form-group.full.hidden.name-form-group
+            input#artifactId.form-control(tabindex='5', type='text', value='demo',
+                name='artifactId', v-model.trim='artifactId', @input='$v.artifactId.$touch()')
+            span.help-block(v-if='$v.artifactId.$error && !$v.artifactId.required') artifactId is required
+        .form-group.full.hidden
             label.control-label(for='name') Name
-            input#name.form-control(tabindex='6', type='text', value='demo', name='name')
-        .form-group.full.hidden.packagename-form-group
+            input#name.form-control(tabindex='6', type='text', value='demo', name='name', v-model.trim='name')
+        .form-group.full.hidden
             label.control-label(for='packageName') Package Name
-            input#packageName.form-control(tabindex='8', type='text', value='com.example.demo', name='packageName')
-        .form-group.full.hidden.javaversion-form-group
+            input#packageName.form-control(tabindex='8', type='text', value='com.example.demo', 
+                name='packageName', v-model.trim='packageName')
+        .form-group.full.hidden
             label.control-label(for='javaVersion') Java Version
-            select#javaVersion.form-control(tabindex='10', name='javaVersion')
-                option(value='1.8', selected='') 8
+            select#javaVersion.form-control(tabindex='10', name='javaVersion', v-model.trim='javaVersion')
+                option(value='1.8', selected) 8
