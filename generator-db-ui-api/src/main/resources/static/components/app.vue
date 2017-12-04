@@ -6,13 +6,15 @@
                 small &nbsp;&nbsp;generate your application now
         main.container
             form-wizard(@on-complete='onComplete', color="#a44040")
-                h2(slot="title") This will replace my whole title
+                h2(slot="title") Generate project
                 tab-content(title='Personal details', icon='fa fa-user', :before-change="()=>validateStep('step1')")
                     step1(ref="step1", @on-validate="mergePartialModels")
-                tab-content(title='Additional Info', icon='fa fa-tasks', :before-change="()=>validateStep('step2')")
+                tab-content(title='Additional Info', icon='fa fa-tasks')
                     step2(ref="step2", @on-validate="mergePartialModels")
+                tab-content(title='Additional Info', icon='fa fa-tasks', :before-change="()=>validateStep('step2')")
+                    step2(ref="step3", @on-validate="mergePartialModels")
                 tab-content(title='Last step', icon='fa fa-check')
-                    include fragments/step3.pug
+                    include fragments/step4.pug
         footer.container
             p (c) Daria Pydorenko, 2017
 </template>
@@ -21,6 +23,7 @@
     import axios from 'axios'
     import step1 from '../components/steps/step1.vue'
     import step2 from '../components/steps/step2.vue'
+    import step3 from '../components/steps/step3.vue'
 
     export default {
         name: 'app',
@@ -31,13 +34,14 @@
         },
         components: {
             'step1': step1,
-            'step2': step2
+            'step2': step2,
+            'step3': step3
         },
         methods: {
             validateStep(name) {
                 return this.$refs[name].validate();
             },
-            mergePartialModels(model, isValid){
+            mergePartialModels(model, isValid) {
                 if(isValid){
                     this.finalModel = Object.assign({},this.finalModel, model)
                 }

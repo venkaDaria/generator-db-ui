@@ -1,7 +1,5 @@
 <template lang="pug">
-    .container
-        include ../fragments/step1.pug
-        label.switcher(v-on:click='switchVersion') Switch to the full version
+    include ../fragments/step1.pug
 </template>
 
 <script>
@@ -14,11 +12,11 @@
                 full: true,
                 text: 'Switch to the full version',
                 // form-data
-                groupId: '',
-                artifactId: '',
-                name: '',
-                packageName: '',
-                javaVersion: ''
+                groupId: 'demo',
+                artifactId: 'com.example',
+                name: 'demo',
+                packageName: 'com.example.demo',
+                javaVersion: '1.8'
             }
         },
         validations: {
@@ -28,17 +26,31 @@
             artifactId: {
                 required
             },
+            name: {
+            },
+            packageName: {
+            },
+            javaVersion: {
+            },
             form: ['groupId', 'artifactId', 'name', 'packageName', 'javaVersion']
         },
         methods: {
-            validate() {
+            applyParams: function () {
+                if (!this.full) {
+                    this.name = this.groupId;
+                    this.packageName = this.artifactId + '.' + this.groupId;
+                }
+            }, validate() {
+                this.applyParams();
+
                 this.$v.form.$touch();
                 let isValid = !this.$v.form.$invalid;
                 this.$emit('on-validate', this.$data, isValid);
-                //TODO: return isValid
-                return true
+                return isValid
             },
             switchVersion: function () {
+                this.applyParams();
+
                 this.text = this.full ? 'Switch to the short version' : 'Switch to the full version';
                 this.full = !this.full;
                 $(".full").toggleClass("hidden");

@@ -1,30 +1,32 @@
-h2
-    span.rwd-line
-        label(for='db') Generate a project with
-        select#db.form-control(name='db')
-            option(value='MySQL', selected='') MySQL
-            option(value='MongoDB') MongoDB
-.col-sm-12.col-md-6
-    h2 Project Metadata
-        p Artifact coordinates
-        .form-group(v-bind:class="{ 'has-error': $v.groupId.$error }")
-            label.control-label(for='groupId') Group
-            input#groupId.form-control(tabindex='4', type='text', value='com.example',
-                name='groupId', v-model.trim='groupId', @input='$v.groupId.$touch()')
-            span.help-block(v-if='$v.groupId.$error && !$v.groupId.required') groupId is required
-        .form-group(v-bind:class="{ 'has-error': $v.artifactId.$error }")
-            label.control-label(for='artifactId') Artifact
-            input#artifactId.form-control(tabindex='5', type='text', value='demo',
-                name='artifactId', v-model.trim='artifactId', @input='$v.artifactId.$touch()')
-            span.help-block(v-if='$v.artifactId.$error && !$v.artifactId.required') artifactId is required
-        .form-group.full.hidden
-            label.control-label(for='name') Name
-            input#name.form-control(tabindex='6', type='text', value='demo', name='name', v-model.trim='name')
-        .form-group.full.hidden
-            label.control-label(for='packageName') Package Name
-            input#packageName.form-control(tabindex='8', type='text', value='com.example.demo', 
-                name='packageName', v-model.trim='packageName')
-        .form-group.full.hidden
-            label.control-label(for='javaVersion') Java Version
-            select#javaVersion.form-control(tabindex='10', name='javaVersion', v-model.trim='javaVersion')
-                option(value='1.8', selected) 8
+.container
+    h2
+        span.rwd-line
+            label(for='db') Generate a project with
+            select#db.form-control(name='db')
+                option(value='MySQL', selected) MySQL
+                option(value='MongoDB') MongoDB
+    .col-sm-12.col-md-6
+        h2 Project Metadata
+            p Artifact coordinates
+            .form-group(v-bind:class="{ 'has-error': $v.groupId.$error }")
+                label.control-label(for='groupId') Group
+                input#groupId.form-control(tabindex='4', type='text',
+                    name='groupId', v-model.trim='groupId', @input='$v.groupId.$touch()')
+                span.help-block(v-if='$v.groupId.$error && !$v.groupId.required') groupId is required
+            .form-group(v-bind:class="{ 'has-error': $v.artifactId.$error }")
+                label.control-label(for='artifactId') Artifact
+                input#artifactId.form-control(tabindex='5', type='text',
+                    name='artifactId', v-model.trim='artifactId', @input='$v.artifactId.$touch()')
+                span.help-block(v-if='$v.artifactId.$error && !$v.artifactId.required') artifactId is required
+            .form-group.full.hidden
+                label.control-label(for='name') Name
+                input#name.form-control(tabindex='6', type='text', name='name', v-model.trim='name')
+            .form-group.full.hidden
+                label.control-label(for='packageName') Package Name
+                input#packageName.form-control(tabindex='8', type='text',
+                    name='packageName', v-model.trim='packageName')
+            .form-group.full.hidden
+                label.control-label(for='javaVersion') Java Version
+                select#javaVersion.form-control(tabindex='10', name='javaVersion', v-model.trim='javaVersion')
+                    option(value='1.8', selected) 8
+    label.switcher(v-on:click='switchVersion') Switch to the full version
