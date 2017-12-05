@@ -11,7 +11,7 @@
             .form-group(v-bind:class="{ 'has-error': $v.groupId.$error }")
                 label.control-label(for='groupId') Group
                 input#groupId.form-control(tabindex='4', type='text',
-                    name='groupId', v-model.trim='groupId', @input='$v.groupId.$touch()')
+                name='groupId', v-model.trim='groupId', @input='$v.groupId.$touch()')
                 span.help-block(v-if='$v.groupId.$error && !$v.groupId.required') groupId is required
             .form-group(v-bind:class="{ 'has-error': $v.artifactId.$error }")
                 label.control-label(for='artifactId') Artifact

@@ -4,18 +4,17 @@
 
 <script>
     import { required, minLength } from 'vuelidate/lib/validators'
-    import ValidateMixin from "../../js/mixin";
+    import ValidateMixin from "../../js/utils/mixin";
     import app from '../app.vue'
 
     export default {
         name: 'step3',
         data() {
             return {
-                options: [],
+                bounds: [],
                 option1: '',
                 option2: '',
-                bind: '',
-                entities: this.$root.finalModel.entities
+                bind: '0'
             }
         },
         validations: {
@@ -25,17 +24,22 @@
             option2: {
                 required
             },
-            form: ['option1', 'option2']
+            bind: {
+            },
+            form: ['bind', 'option1', 'option2']
         },
         mixins:[ValidateMixin],
         methods: {
-            addBound(idx) {
+            entities() {
+                return this.$store.getters.entities;
+            },
+            addBound() {
                 let isOkay = this.validate();
                 if (isOkay) {
-                    this.options.push({
+                    this.bounds.push({
                         option1: this.option1,
                         option2: this.option2,
-                        bind: idx
+                        bind: this.bind
                     });
                 } else {
 
@@ -44,15 +48,3 @@
         }
     }
 </script>
-
-<style>
-    .flex {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .flex-div {
-        flex: 1;
-        margin: 15px;
-    }
-</style>

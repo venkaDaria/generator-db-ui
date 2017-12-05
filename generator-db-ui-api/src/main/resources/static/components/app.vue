@@ -24,6 +24,7 @@
     import step1 from '../components/steps/step1.vue'
     import step2 from '../components/steps/step2.vue'
     import step3 from '../components/steps/step3.vue'
+    import store from "../js/utils/store";
 
     export default {
         name: 'app',
@@ -46,12 +47,16 @@
             },
             mergePartialModels(model, isValid) {
                 if(isValid){
-                    this.finalModel = Object.assign({},this.finalModel, model)
+                    this.finalModel = Object.assign({},this.finalModel, model);
+                    this.$store.dispatch('ADD', this.finalModel.entities)
+                        .catch(err => console.log(err));
                 }
             },
             onComplete() {
-                console.log(this.finalModel);
-                axios.post('localhost:4567/generate', this.finalModel)
+                axios.post('http://localhost:4567/generate', this.finalModel, { responseType: 'arraybuffer'})
+                    .then(function (response) {
+                        console.log("hello");
+                })
             }
         }
     }

@@ -4,7 +4,7 @@
 
 <script>
     import { required, minLength } from 'vuelidate/lib/validators'
-    import ValidateMixin from "../../js/mixin";
+    import ValidateMixin from "../../js/utils/mixin";
 
     export default {
         name: 'step2',
@@ -12,7 +12,7 @@
             return {
                 entities: [],
                 name: '',
-                dataType: String,
+                dataType: 'String',
                 isNull: true,
                 isUnique: false
             }

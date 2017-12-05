@@ -19,9 +19,9 @@ div
         span.help-block(v-if='$v.dataType.$error && !$v.dataType.required') DataType is required
     .form-group
         label IsUnique
-        input.form-control(type=checkbox, v-model.trim='isUnique')
+        input.form-check-input(type="checkbox", v-model.trim='isUnique')
     .form-group
         label IsNull
-        input.form-control(type=checkbox, v-model.trim='isNull')
+        input.form-check-input(type="checkbox", v-model.trim='isNull')
     br
     input.btn.btn-info(type='button', v-on:click='addEntity', value='Add Entity')
