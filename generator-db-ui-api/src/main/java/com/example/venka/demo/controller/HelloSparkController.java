@@ -1,25 +1,27 @@
 package com.example.venka.demo.controller;
 
-import com.google.gson.Gson;
+import com.example.venka.demo.utils.GeneratorApp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import spark.Request;
 import spark.Response;
 
+import static com.example.venka.demo.utils.JsonMapper.toMap;
 import static spark.Spark.*;
 
 @Controller
 public class HelloSparkController {
 
-    private static final Gson GSON = new Gson();
-
-    private HelloSparkController() {
-        get("/step1", (request, response) -> "step1", GSON::toJson);
+    private HelloSparkController(final GeneratorApp app) {
+        post("/generate", (request, response) -> {
+            response.type("application/zip");
+            return app.generate(toMap(request.body()));
+        });
         enableCORS();
     }
 
     // Enables CORS on requests. This method is an initialization method and should be called once.
     private void enableCORS() {
-
         options("/*", (request, response) -> {
 
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");

@@ -1,0 +1,17 @@
+.flex
+    .flex-div
+        h3 One to One
+        include form.pug
+        input.btn.btn-info(type='button', v-on:click='addBound(0)', value='Add Bound')
+    .flex-div
+        h3 One to Many
+        include form.pug
+        input.btn.btn-info(type='button', v-on:click='addBound(1)', value='Add Bound')
+    .flex-div
+        h3 Many to One
+        include form.pug
+        input.btn.btn-info(type='button', v-on:click='addBound(2)', value='Add Bound')
+    .flex-div
+        h3 Many to Many
+        include form.pug
+        input.btn.btn-info(type='button', v-on:click='addBound(3)', value='Add Bound')

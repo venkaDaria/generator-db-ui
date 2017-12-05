@@ -11,8 +11,8 @@
                     step1(ref="step1", @on-validate="mergePartialModels")
                 tab-content(title='Additional Info', icon='fa fa-tasks')
                     step2(ref="step2", @on-validate="mergePartialModels")
-                tab-content(title='Additional Info', icon='fa fa-tasks', :before-change="()=>validateStep('step2')")
-                    step2(ref="step3", @on-validate="mergePartialModels")
+                tab-content(title='Additional Info', icon='fa fa-link')
+                    step3(ref="step3", @on-validate="mergePartialModels")
                 tab-content(title='Last step', icon='fa fa-check')
                     include fragments/step4.pug
         footer.container
@@ -38,6 +38,9 @@
             'step3': step3
         },
         methods: {
+            getEntities() {
+                return this.finalModel.entities;
+            },
             validateStep(name) {
                 return this.$refs[name].validate();
             },
@@ -48,7 +51,7 @@
             },
             onComplete() {
                 console.log(this.finalModel);
-                // axios
+                axios.post('localhost:4567/generate', this.finalModel)
             }
         }
     }

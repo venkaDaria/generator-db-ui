@@ -3,7 +3,11 @@
 </template>
 
 <script>
-    import { required, minLength, email } from 'vuelidate/lib/validators'
+    import { required } from 'vuelidate/lib/validators'
+
+    function patternGroup(value) {
+        return /^[a-zA-Z].*$/.test(value)
+    }
 
     export default {
         name: 'step1',
@@ -12,8 +16,8 @@
                 full: true,
                 text: 'Switch to the full version',
                 // form-data
-                groupId: 'demo',
-                artifactId: 'com.example',
+                groupId: 'com.example',
+                artifactId: 'demo',
                 name: 'demo',
                 packageName: 'com.example.demo',
                 javaVersion: '1.8'
@@ -21,7 +25,8 @@
         },
         validations: {
             groupId: {
-                required
+                required,
+                patternGroup
             },
             artifactId: {
                 required
@@ -37,8 +42,8 @@
         methods: {
             applyParams: function () {
                 if (!this.full) {
-                    this.name = this.groupId;
-                    this.packageName = this.artifactId + '.' + this.groupId;
+                    this.name = this.artifactId;
+                    this.packageName = this.groupId  + '.' + this.artifactId;
                 }
             }, validate() {
                 this.applyParams();

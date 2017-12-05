@@ -3,39 +3,45 @@
 </template>
 
 <script>
-    import { required, minLength, email } from 'vuelidate/lib/validators'
+    import { required, minLength } from 'vuelidate/lib/validators'
+    import ValidateMixin from "../../js/mixin";
 
     export default {
         name: 'step2',
         data() {
             return {
                 entities: [],
-                country: '',
-                city: '',
+                name: '',
+                dataType: String,
+                isNull: true,
+                isUnique: false
             }
         },
         validations: {
-            country: {
+            name: {
+                required,
+                minLength: minLength(3)
+
+            },
+            dataType: {
                 required
             },
-            city: {
-                required
+            isNull: {
             },
-            form: ['country', 'city']
+            isUnique: {
+            },
+            form: ['name', 'dataType', 'isUnique', 'isNull']
         },
+        mixins:[ValidateMixin],
         methods: {
-            validate() {
-                this.$v.form.$touch();
-                let isValid = !this.$v.form.$invalid;
-                this.$emit('on-validate', this.$data, isValid);
-                return isValid
-            },
             addEntity() {
                 let isOkay = this.validate();
                 if (isOkay) {
                     this.entities.push({
-                        country: this.country,
-                        city: this.city
+                        name: this.name,
+                        dataType: this.dataType,
+                        isUnique: this.isUnique,
+                        isNull: this.isNull
                     });
                 } else {
 

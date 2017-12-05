@@ -10,3 +10,8 @@ public class DbUIApplication {
         SpringApplication.run(DbUIApplication.class, args);
     }
 }
+
+// TODO: front (3, unique names in 2)
+// back-end
+// check work
+// more validate
