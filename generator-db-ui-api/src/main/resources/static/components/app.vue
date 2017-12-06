@@ -53,9 +53,20 @@
                 }
             },
             onComplete() {
-                axios.post('http://localhost:4567/generate', this.finalModel, { responseType: 'arraybuffer'})
+                let a = document.createElement("a");
+                document.body.appendChild(a);
+                a.style = "display: none";
+
+                let name = this.finalModel.name + ".zip";
+
+                axios.post('http://localhost:4567/generate', this.finalModel, { responseType: 'blob'})
                     .then(function (response) {
-                        console.log("hello");
+                        console.log(response);
+                        let url = window.URL.createObjectURL(response.data);
+                        a.href = url;
+                        a.download = name;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
                 })
             }
         }

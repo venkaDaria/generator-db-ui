@@ -12,7 +12,8 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class GeneratorApp {
 
-    public byte[] generate(final Map<String, String> body) throws IOException {
+    // final Map<String, String> body
+    public byte[] generate() throws IOException {
         //creating byteArray stream, make it bufforable and passing this buffor to ZipOutputStream
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);

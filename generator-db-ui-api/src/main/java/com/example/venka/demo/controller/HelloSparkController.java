@@ -15,7 +15,9 @@ public class HelloSparkController {
     private HelloSparkController(final GeneratorApp app) {
         post("/generate", (request, response) -> {
             response.type("application/zip");
-            return app.generate(toMap(request.body()));
+            response.header("Content-Disposition", "attachment; filename=example.zip");
+            return app.generate();
+            //return app.generate(toMap(request.body()));
         });
         enableCORS();
     }
