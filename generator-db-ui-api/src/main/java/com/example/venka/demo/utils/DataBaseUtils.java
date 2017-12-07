@@ -28,4 +28,15 @@ public class DataBaseUtils {
                 return "";
         }
     }
+
+    public String getDependencies(final String dataBase) {
+        switch (dataBase) {
+            case "MySQL":
+                return "compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'";
+            case "MongoDB":
+                return "compile('org.springframework.boot:spring-boot-starter-data-mongodb')";
+            default:
+                return "";
+        }
+    }
 }

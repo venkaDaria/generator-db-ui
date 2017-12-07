@@ -26,15 +26,18 @@ public class GeneratorFiles {
         final File target = createTargetDirectory(source);
 
         setMetadata(target, body);
-        // change templates
+        // DataBaseUtils - add children
+        // change templates - footer, header
+        // add property .name ?
         // create files
+        // см. последнюю редакцию ДБ
 
         return target;
     }
 
     @NotNull
     private static File createTargetDirectory(File source) throws IOException {
-        Files.deleteIfExists(Paths.get(source.getName() + "-temp"));
+        FileUtils.deleteDirectory(Paths.get(source.getName() + "-temp").toFile());
         final File target =  Files.createDirectory(Paths.get("generator-db-ui-template-temp")).toFile();
         FileUtils.copyDirectory(source, target);
         return target;
@@ -43,9 +46,6 @@ public class GeneratorFiles {
     private void setMetadata(final File directory, final Map<String, String> body) throws IOException {
         final String groupId = body.get("groupId");
         final String artifactId = body.get("artifactId");
-        final String name = body.get("name");
-        final String packageName = body.get("packageName");
-        final String javaVersion = body.get("javaVersion");
         final String userName = body.get("userName");
         final String password = body.get("password");
         final String dataBase = body.get("dataBase");
@@ -54,8 +54,12 @@ public class GeneratorFiles {
         final Path path = file.toPath();
         replace(path, "\\[username\\]", userName);
         replace(path, "\\[password\\]", password);
-        replace(path, "\\[url\\]", dataBaseUtils.getUrl(dataBase, name));
+        replace(path, "\\[url\\]", dataBaseUtils.getUrl(dataBase, artifactId));
         replace(path, "\\[platform\\]", dataBaseUtils.getPlatform(dataBase));
+
+        final Path pathGradle = new File(directory.getPath() + "/build.gradle").toPath();
+        replace(pathGradle, "\\[group\\]", "'" + groupId + "'");
+        replace(pathGradle, "\\[compile\\]", dataBaseUtils.getDependencies(dataBase));
     }
 
     private void replace(final Path path, final String regex, final String replacement) throws IOException {
