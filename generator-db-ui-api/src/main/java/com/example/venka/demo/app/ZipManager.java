@@ -1,11 +1,9 @@
-package com.example.venka.demo.utils;
+package com.example.venka.demo.app;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -42,11 +40,12 @@ public class ZipManager {
             return;
         } if (file.isDirectory()) {
             File[] children = file.listFiles();
+            if (children == null) {
+                return;
+            }
 
-            if (children != null) {
-                for (File childFile : children) {
-                    packDirectory(zipOutputStream, childFile, fileName + "/" + childFile.getName());
-                }
+            for (File childFile : children) {
+                packDirectory(zipOutputStream, childFile, fileName + "/" + childFile.getName());
             }
         } else {
             packFile(zipOutputStream, file, fileName);

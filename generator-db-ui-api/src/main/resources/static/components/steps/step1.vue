@@ -20,7 +20,10 @@
                 artifactId: 'demo',
                 name: 'demo',
                 packageName: 'com.example.demo',
-                javaVersion: '1.8'
+                javaVersion: '1.8',
+                userName: 'root',
+                password: 'root',
+                dataBase: 'MySQL'
             }
         },
         validations: {
@@ -37,7 +40,13 @@
             },
             javaVersion: {
             },
-            form: ['groupId', 'artifactId', 'name', 'packageName', 'javaVersion']
+            userName: {
+            },
+            password: {
+            },
+            dataBase: {
+            },
+            form: ['dataBase','groupId', 'artifactId', 'name', 'packageName', 'javaVersion', 'userName', 'password', 'dataBase']
         },
         methods: {
             applyParams: function () {

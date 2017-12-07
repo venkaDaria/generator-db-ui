@@ -4,10 +4,12 @@ dependencies {
     compile group: 'com.google.code.gson', name: 'gson'
     compile group: 'com.sparkjava', name: 'spark-core'
 
-    compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+    compile group: 'commons-io', name: 'commons-io'
 
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: "${springBootVersion}"
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
+    compile group: 'org.jetbrains', name: 'annotations'
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.18'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
+    compileOnly group: 'org.projectlombok', name: 'lombok'
 }

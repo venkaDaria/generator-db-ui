@@ -1,0 +1,15 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<table th:fragment="tableFragment">
+    <tr>
+        <th th:each="header : ${headers}" th:text="${header}">
+        <th th:if="${className}">Operations</th>
+    </tr>
+    <tr th:each="entity : ${dataSet}">
+        <td th:each="field : ${entity.getFields()}" th:text="${field}"></td>
+        <td th:if="${className}">
+            <a th:href="'/' + ${className} + '/save/'+ ${entity.id}">Edit</a>
+            &nbsp|&nbsp
+            <a th:href="'/' + ${className} + '/confirm/'+ ${entity.id}">Delete</a>
+        </td>
+    </tr>
+</table>
