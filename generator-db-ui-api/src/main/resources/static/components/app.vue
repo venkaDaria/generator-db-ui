@@ -59,7 +59,7 @@
 
                 let name = this.finalModel.name + ".zip";
 
-                axios.post('http://localhost:4567/generate', this.finalModel, { responseType: 'blob'})
+                axios.post('http://localhost:4567/create', this.finalModel, { responseType: 'blob'})
                     .then(function (response) {
                         console.log(response);
                         let url = window.URL.createObjectURL(response.data);

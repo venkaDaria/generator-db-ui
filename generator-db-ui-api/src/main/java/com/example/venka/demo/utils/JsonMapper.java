@@ -8,7 +8,7 @@ import java.util.Map;
 
 public final class JsonMapper {
     private static final Gson GSON = new Gson();
-    private static final Type type = new TypeToken<Map<String, String>>() {
+    private static final Type type = new TypeToken<Map<String, Object>>() {
         // empty
     }.getType();
 

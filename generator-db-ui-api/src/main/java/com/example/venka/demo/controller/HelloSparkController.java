@@ -1,7 +1,6 @@
 package com.example.venka.demo.controller;
 
-import com.example.venka.demo.utils.GeneratorApp;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.venka.demo.utils.ZipManager;
 import org.springframework.stereotype.Controller;
 import spark.Request;
 import spark.Response;
@@ -12,12 +11,11 @@ import static spark.Spark.*;
 @Controller
 public class HelloSparkController {
 
-    private HelloSparkController(final GeneratorApp app) {
+    private HelloSparkController(final ZipManager app) {
         post("/generate", (request, response) -> {
             response.type("application/zip");
             response.header("Content-Disposition", "attachment; filename=example.zip");
-            return app.generate();
-            //return app.generate(toMap(request.body()));
+            return app.create(toMap(request.body()));
         });
         enableCORS();
     }
