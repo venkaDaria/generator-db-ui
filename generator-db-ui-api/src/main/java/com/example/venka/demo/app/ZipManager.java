@@ -3,7 +3,11 @@ package com.example.venka.demo.app;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -38,7 +42,8 @@ public class ZipManager {
     private void packDirectory(final ZipOutputStream zipOutputStream, final File file, final String fileName) throws IOException {
         if (file.isHidden()) {
             return;
-        } if (file.isDirectory()) {
+        }
+        if (file.isDirectory()) {
             File[] children = file.listFiles();
             if (children == null) {
                 return;
