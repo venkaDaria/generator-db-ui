@@ -5,41 +5,51 @@
 <script>
     import { required, minLength } from 'vuelidate/lib/validators'
     import ValidateMixin from "../../js/utils/mixin";
-    import app from '../app.vue'
 
     export default {
         name: 'step3',
         data() {
             return {
-                bounds: [],
-                option1: '',
-                option2: '',
-                bind: '0'
+                fields: [],
+                nowEntity: '',
+                name: '',
+                dataType: 'String',
+                isNull: true,
+                isUnique: false
             }
         },
         validations: {
-            option1: {
+            name: {
                 required,
+                minLength: minLength(3)
+
             },
-            option2: {
+            nowEntity: {
                 required
             },
-            bind: {
+            dataType: {
+                required
             },
-            form: ['bind', 'option1', 'option2']
+            isNull: {
+            },
+            isUnique: {
+            },
+            form: ['nowEntity', 'name', 'dataType', 'isUnique', 'isNull']
         },
         mixins:[ValidateMixin],
         methods: {
             entities() {
                 return this.$store.getters.entities;
             },
-            addBound() {
+            addField() {
                 let isOkay = this.validate();
                 if (isOkay) {
-                    this.bounds.push({
-                        option1: this.option1,
-                        option2: this.option2,
-                        bind: this.bind
+                    this.fields.push({
+                        parent: this.nowEntity,
+                        name: this.name,
+                        dataType: this.dataType,
+                        isUnique: this.isUnique,
+                        isNull: this.isNull
                     });
                 } else {
 

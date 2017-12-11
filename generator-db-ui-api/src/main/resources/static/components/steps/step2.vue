@@ -11,10 +11,7 @@
         data() {
             return {
                 entities: [],
-                name: '',
-                dataType: 'String',
-                isNull: true,
-                isUnique: false
+                name: ''
             }
         },
         validations: {
@@ -23,14 +20,7 @@
                 minLength: minLength(3)
 
             },
-            dataType: {
-                required
-            },
-            isNull: {
-            },
-            isUnique: {
-            },
-            form: ['name', 'dataType', 'isUnique', 'isNull']
+            form: ['name']
         },
         mixins:[ValidateMixin],
         methods: {
@@ -39,9 +29,6 @@
                 if (isOkay) {
                     this.entities.push({
                         name: this.name,
-                        dataType: this.dataType,
-                        isUnique: this.isUnique,
-                        isNull: this.isNull
                     });
                 } else {
 

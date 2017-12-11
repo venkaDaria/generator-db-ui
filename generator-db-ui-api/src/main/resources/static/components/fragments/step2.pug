@@ -1,27 +1,12 @@
 div
     ul#entities
     li(v-for='entity in entities')
-        | {{ entity.name }} {{ entity.dataType }} {{ entity.isUnique ? 'Unique' : 'NotUnique'}} {{ entity.isNull ? 'Null' : 'NotNull' }}
+        | {{ entity.name }}
     br
     br
     .form-group(v-bind:class="{ 'has-error': $v.name.$error }")
         label Name
         input.form-control(v-model.trim='name', @input='$v.name.$touch()')
         span.help-block(v-if='$v.name.$error && !$v.name.required') Name is required
-    .form-group(v-bind:class="{ 'has-error': $v.dataType.$error }")
-        label DataType
-        select.form-control(v-model.trim='dataType', @input='$v.dataType.$touch()')
-            option String
-            option Integer
-            option Double
-            option LocalDate
-            option LocalDateTime
-        span.help-block(v-if='$v.dataType.$error && !$v.dataType.required') DataType is required
-    .form-group
-        label IsUnique
-        input.form-check-input(type="checkbox", v-model.trim='isUnique')
-    .form-group
-        label IsNull
-        input.form-check-input(type="checkbox", v-model.trim='isNull')
     br
     input.btn.btn-info(type='button', v-on:click='addEntity', value='Add Entity')

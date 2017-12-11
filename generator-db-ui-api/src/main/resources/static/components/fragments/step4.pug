@@ -1,2 +1,25 @@
-| Here is your final model:
-pre {{finalModel}}
+div
+    ul#bounds
+        li(v-for='bound in bounds')
+            | {{ bound.option1 }} - {{ bound.option2 }} ({{ bound.bind }})
+    br
+    br
+    .form-group(v-bind:class="{ 'has-error': $v.option1.$error }")
+        label option1
+        select.form-control(v-model.trim='option1', @input='$v.option1.$touch()')
+            option(v-for='entity in entities()', v-bind:value="entity.name") {{ entity.name }}
+        span.help-block(v-if='$v.option1.$error && !$v.option1.required') option1 is required
+    .form-group(v-bind:class="{ 'has-error': $v.option2.$error }")
+        label option2
+        select.form-control(v-model.trim='option2', @input='$v.option2.$touch()')
+            option(v-for='entity in entities()', v-bind:value="entity.name") {{ entity.name }}
+        span.help-block(v-if='$v.option2.$error && !$v.option2.required') option2 is required
+    .form-group(v-bind:class="{ 'has-error': $v.option2.$error }")
+        label bind
+        select.form-control(v-model.trim='bind', @input='$v.bind.$touch()')
+            option(value="0") One to one
+            option(value="1") One to many
+            option(value="2") Many to one
+            option(value="3") Many to Many
+        span.help-block(v-if='$v.option2.$error && !$v.option2.required') bind is required
+    input.btn.btn-info(type='button', v-on:click='addBound', value='Add Bound')

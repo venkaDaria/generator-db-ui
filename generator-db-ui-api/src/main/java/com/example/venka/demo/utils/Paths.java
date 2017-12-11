@@ -9,4 +9,8 @@ public class Paths {
     public static final String HEADER = TEMPLATES + "/header.html";
 
     public static final String PROPERTIES ="/src/main/resources/application.properties";
+
+    public static final String MAIN_PACKAGE = "/src/main/java";
+
+    public static final String OLD_PACKAGE = "/com/example/venka/lab5";
 }

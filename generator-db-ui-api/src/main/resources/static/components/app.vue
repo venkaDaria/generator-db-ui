@@ -11,19 +11,22 @@
                     step1(ref="step1", @on-validate="mergePartialModels")
                 tab-content(title='Additional Info', icon='fa fa-tasks')
                     step2(ref="step2", @on-validate="mergePartialModels")
-                tab-content(title='Additional Info', icon='fa fa-link')
+                tab-content(title='Additional Info', icon='fa fa-address-card')
                     step3(ref="step3", @on-validate="mergePartialModels")
+                tab-content(title='Additional Info', icon='fa fa-link')
+                    step4(ref="step4", @on-validate="mergePartialModels")
                 tab-content(title='Last step', icon='fa fa-check')
-                    include fragments/step4.pug
+                    include fragments/step5.pug
         footer.container
             p (c) Daria Pydorenko, 2017
 </template>
 
 <script>
     import axios from 'axios'
-    import step1 from '../components/steps/step1.vue'
-    import step2 from '../components/steps/step2.vue'
-    import step3 from '../components/steps/step3.vue'
+    import step1 from './steps/step1.vue'
+    import step2 from './steps/step2.vue'
+    import step3 from './steps/step3.vue'
+    import step4 from './steps/step4.vue'
     import store from "../js/utils/store";
 
     export default {
@@ -36,12 +39,10 @@
         components: {
             'step1': step1,
             'step2': step2,
-            'step3': step3
+            'step3': step3,
+            'step4': step4
         },
         methods: {
-            getEntities() {
-                return this.finalModel.entities;
-            },
             validateStep(name) {
                 return this.$refs[name].validate();
             },

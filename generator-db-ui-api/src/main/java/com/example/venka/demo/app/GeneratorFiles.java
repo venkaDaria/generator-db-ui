@@ -16,6 +16,8 @@ import java.util.Map;
 
 import static com.example.venka.demo.utils.Paths.FOOTER;
 import static com.example.venka.demo.utils.Paths.HEADER;
+import static com.example.venka.demo.utils.Paths.MAIN_PACKAGE;
+import static com.example.venka.demo.utils.Paths.OLD_PACKAGE;
 import static com.example.venka.demo.utils.Paths.PROPERTIES;
 
 @Component
@@ -32,7 +34,7 @@ public class GeneratorFiles {
     @NotNull
     private static File createTargetDirectory(File source) throws IOException {
         FileUtils.deleteDirectory(Paths.get(source.getName() + "-temp").toFile());
-        final File target = Files.createDirectory(Paths.get("generator-db-ui-template-temp")).toFile();
+        final File target = Files.createDirectory(Paths.get(source.getName() + "-temp")).toFile();
         FileUtils.copyDirectory(source, target);
         return target;
     }
@@ -45,10 +47,30 @@ public class GeneratorFiles {
 
         setMetadata(target, body);
         changeTemplates(target, body);
+        changeDirectories(target, body);
 
         asmService.createFiles(target, body);
 
         return target;
+    }
+
+    private void changeDirectories(final File source, final Map<String, String> body) throws IOException {
+        final String packageName = getPackageDir(body);
+
+        final File temporary = new File("temp");
+        final File sourceReal = new File(source.getName() + MAIN_PACKAGE + OLD_PACKAGE);
+
+        FileUtils.copyDirectory(sourceReal, temporary);
+        FileUtils.deleteDirectory(sourceReal);
+
+        final File target = Files.createDirectories(Paths.get(source.getName() + MAIN_PACKAGE + packageName)).toFile();
+
+        FileUtils.copyDirectory(temporary, target);
+        FileUtils.deleteDirectory(temporary);
+    }
+
+    public static String getPackageDir(Map<String, String> body) {
+        return "/" + body.get("packageName").replace(".", "/");
     }
 
     private void changeTemplates(File directory, Map<String, String> body) throws IOException {
