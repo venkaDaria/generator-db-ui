@@ -38,7 +38,8 @@ public class AsmService {
             cw.visitField(ACC_PRIVATE, field.get("name").toString(), getDescription(field),
                     null, null).visitEnd();
 
-            if (Boolean.valueOf(field.get("mainField").toString())) {
+            final Object isMain = field.get("isMain");
+            if (isMain != null && Boolean.valueOf(isMain.toString())) {
                 createMethods(packageName, cw, field);
             }
         });
