@@ -11,7 +11,6 @@ public class DbUIApplication {
     }
 }
 
-// TODO: front (3, unique names in 2)
-// back-end
-// check work
-// more validate
+// TODO: back-end (see CreatorService TODOs)
+// TODO: check work, final, front (unique names)
+// TODO: more validate

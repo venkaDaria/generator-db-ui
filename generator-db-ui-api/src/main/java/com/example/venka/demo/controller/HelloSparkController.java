@@ -1,22 +1,33 @@
 package com.example.venka.demo.controller;
 
-import com.example.venka.demo.app.ZipManager;
+import com.example.venka.demo.service.GeneratorFiles;
+import com.example.venka.demo.utils.zip.ZipManager;
 import org.springframework.stereotype.Controller;
 import spark.Request;
 import spark.Response;
 
+import java.io.File;
+import java.util.Map;
+
 import static com.example.venka.demo.utils.JsonMapper.toMap;
-import static spark.Spark.*;
+import static spark.Spark.before;
+import static spark.Spark.options;
+import static spark.Spark.post;
 
 @Controller
 public class HelloSparkController {
 
-    private HelloSparkController(final ZipManager app) {
+    private HelloSparkController(final ZipManager app, final GeneratorFiles generatorFiles) {
         post("/generate", (request, response) -> {
             response.type("application/zip");
             response.header("Content-Disposition", "attachment; filename=example.zip");
-            return app.create(toMap(request.body()));
+
+            final Map<String, Object> body = toMap(request.body());
+            final File directory = generatorFiles.get(body);
+
+            return app.create(directory);
         });
+
         enableCORS();
     }
 

@@ -1,4 +1,4 @@
-package com.example.venka.demo.db;
+package com.example.venka.demo.utils.db;
 
 public class MongoDataBaseUtils implements DataBaseUtils {
 

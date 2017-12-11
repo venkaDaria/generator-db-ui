@@ -12,14 +12,14 @@
             return {
                 fields: [],
                 nowEntity: '',
-                name: '',
+                nameField: '',
                 dataType: 'String',
                 isNull: true,
                 isUnique: false
             }
         },
         validations: {
-            name: {
+            nameField: {
                 required,
                 minLength: minLength(3)
 
@@ -34,7 +34,7 @@
             },
             isUnique: {
             },
-            form: ['nowEntity', 'name', 'dataType', 'isUnique', 'isNull']
+            form: ['nowEntity', 'nameField', 'dataType', 'isUnique', 'isNull']
         },
         mixins:[ValidateMixin],
         methods: {
@@ -46,7 +46,7 @@
                 if (isOkay) {
                     this.fields.push({
                         parent: this.nowEntity,
-                        name: this.name,
+                        name: this.nameField,
                         dataType: this.dataType,
                         isUnique: this.isUnique,
                         isNull: this.isNull

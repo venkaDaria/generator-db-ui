@@ -35,7 +35,11 @@ allprojects {
 
             dependency group: 'org.projectlombok', name: 'lombok', version: '1.16.18'
 
+            dependency group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
+
             dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+            dependency group: 'org.bitbucket.mstrobel', name: 'procyon-compilertools', version: '0.5.32'
         }
     }
 }

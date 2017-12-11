@@ -11,16 +11,16 @@
         data() {
             return {
                 entities: [],
-                name: ''
+                nameEntity: ''
             }
         },
         validations: {
-            name: {
+            nameEntity: {
                 required,
                 minLength: minLength(3)
 
             },
-            form: ['name']
+            form: ['nameEntity']
         },
         mixins:[ValidateMixin],
         methods: {
@@ -28,7 +28,7 @@
                 let isOkay = this.validate();
                 if (isOkay) {
                     this.entities.push({
-                        name: this.name,
+                        name: this.nameEntity,
                     });
                 } else {
 

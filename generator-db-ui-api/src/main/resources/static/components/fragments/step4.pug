@@ -12,7 +12,7 @@ div
     .form-group(v-bind:class="{ 'has-error': $v.option2.$error }")
         label option2
         select.form-control(v-model.trim='option2', @input='$v.option2.$touch()')
-            option(v-for='entity in entities()', v-bind:value="entity.name") {{ entity.name }}
+            option(v-for='entity in entities()', v-bind:value="entity.name", v-if='entity.name != option1') {{ entity.name }}
         span.help-block(v-if='$v.option2.$error && !$v.option2.required') option2 is required
     .form-group(v-bind:class="{ 'has-error': $v.option2.$error }")
         label bind

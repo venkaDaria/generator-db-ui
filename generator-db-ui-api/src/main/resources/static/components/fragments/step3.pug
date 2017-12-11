@@ -1,19 +1,19 @@
 div
-    .form-group(v-bind:class="{ 'has-error': $v.name.$error }")
+    .form-group(v-bind:class="{ 'has-error': $v.nowEntity.$error }")
         label Entities
         select.form-control(v-model.trim='nowEntity')
             option(v-for='entity in entities()') {{ entity.name }}
-        span.help-block(v-if='$v.dataType.$error && !$v.dataType.required') Entity is required
+        span.help-block(v-if='$v.nowEntity.$error && !$v.nowEntity.required') Entity is required
 
     ul#fields
         li(v-for='field in fields', v-if='field.parent == nowEntity')
             | {{ field.name }} {{ field.dataType }} {{ field.isUnique ? 'Unique' : 'NotUnique'}} {{ field.isNull ? 'Null' : 'NotNull' }}
     br
     br
-    .form-group(v-bind:class="{ 'has-error': $v.name.$error }")
+    .form-group(v-bind:class="{ 'has-error': $v.nameField.$error }")
         label Name
-        input.form-control(v-model.trim='name', @input='$v.name.$touch()')
-        span.help-block(v-if='$v.name.$error && !$v.name.required') Name is required
+        input.form-control(v-model.trim='nameField', @input='$v.nameField.$touch()')
+        span.help-block(v-if='$v.nameField.$error && !$v.nameField.required') Name is required
     .form-group(v-bind:class="{ 'has-error': $v.dataType.$error }")
         label DataType
         select.form-control(v-model.trim='dataType', @input='$v.dataType.$touch()')

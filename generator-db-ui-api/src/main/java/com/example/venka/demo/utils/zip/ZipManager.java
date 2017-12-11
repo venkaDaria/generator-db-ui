@@ -1,33 +1,25 @@
-package com.example.venka.demo.app;
+package com.example.venka.demo.utils.zip;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@Component
+@Service
 public class ZipManager {
 
-    private final GeneratorFiles generatorFiles;
-
-    public ZipManager(final GeneratorFiles generatorFiles) {
-        this.generatorFiles = generatorFiles;
-    }
-
-    public byte[] create(final Map<String, String> body) throws IOException {
+    public byte[] create(final File directory) throws IOException {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
         final ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-        final File directory = generatorFiles.get(body);
-        packDirectory(zipOutputStream, directory, generatorFiles.getName(body));
+        packDirectory(zipOutputStream, directory, directory.getName());
 
         zipOutputStream.finish();
         zipOutputStream.flush();

@@ -4,9 +4,9 @@ div
         | {{ entity.name }}
     br
     br
-    .form-group(v-bind:class="{ 'has-error': $v.name.$error }")
+    .form-group(v-bind:class="{ 'has-error': $v.nameEntity.$error }")
         label Name
-        input.form-control(v-model.trim='name', @input='$v.name.$touch()')
-        span.help-block(v-if='$v.name.$error && !$v.name.required') Name is required
+        input.form-control(v-model.trim='nameEntity', @input='$v.nameEntity.$touch()')
+        span.help-block(v-if='$v.nameEntity.$error && !$v.nameEntity.required') Name is required
     br
     input.btn.btn-info(type='button', v-on:click='addEntity', value='Add Entity')

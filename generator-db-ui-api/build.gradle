@@ -11,5 +11,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
 
+    compile group: 'javax.persistence', name: 'persistence-api'
+
     compileOnly group: 'org.projectlombok', name: 'lombok'
+
+    compile group: 'org.bitbucket.mstrobel', name: 'procyon-compilertools'
 }

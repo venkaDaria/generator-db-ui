@@ -16,7 +16,7 @@ public final class JsonMapper {
         // empty
     }
 
-    public static Map<String, String> toMap(final String jsonString) {
+    public static Map<String, Object> toMap(final String jsonString) {
         return GSON.fromJson(jsonString, type);
     }
 }
