@@ -1,15 +1,15 @@
 div
     .form-group(v-bind:class="{ 'has-error': $v.nowEntity.$error }")
         label Entities
-        select.form-control(v-model.trim='nowEntity')
+        select.form-control(v-model.trim='nowEntity', @input='$v.nowEntity.$touch()')
             option(v-for='entity in entities()') {{ entity.name }}
         span.help-block(v-if='$v.nowEntity.$error && !$v.nowEntity.required') Entity is required
 
-    ul#fields.form-group(v-bind:class="{ 'has-error': $v.mainField.$error }")
-        li(v-for='field in fields', v-if='field.parent == nowEntity')
-            | {{ field.name }} {{ field.dataType }} {{ field.isUnique ? 'Unique' : 'NotUnique'}} {{ field.isNull ? 'Null' : 'NotNull' }}
+    section.form-group(v-bind:class="{ 'has-error': $v.mainField.$error }")
+        div(v-for='field in fields', v-if='field.parent == nowEntity')
+            label {{ field.name }} {{ field.dataType }} {{ field.isUnique ? 'Unique' : 'NotUnique'}} {{ field.isNull ? 'Null' : 'NotNull' }}
             | &nbsp;&nbsp;&nbsp;
-            input(type="radio", name="mainField", value="field.name")
+            input(v-model.trim='mainField', v-on:change='saveMainField', type="radio", v-bind:value="field.name")
         span.help-block(v-if='$v.mainField.$error && !$v.mainField.required') You must choose main unique field
     br
     br

@@ -53,9 +53,17 @@
                         name: this.nameField,
                         dataType: this.dataType,
                         isUnique: this.isUnique,
-                        isNull: this.isNull,
-                        mainField: this.mainField
+                        isNull: this.isNull
                     });
+                } else {
+
+                }
+            }, saveMainField() {
+                let isOkay = this.validate();
+                if (isOkay) {
+                    this.fields.forEach(field => {
+                        field['isMain'] = field.parent === this.nowEntity && field.name === this.mainField;
+                    })
                 } else {
 
                 }

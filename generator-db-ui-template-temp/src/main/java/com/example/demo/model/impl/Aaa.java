@@ -11,4 +11,6 @@ public class Aaa extends BaseEntity
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    private String aaa;
+    private String bbb;
 }
