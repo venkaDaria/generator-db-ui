@@ -15,7 +15,8 @@
                 nameField: '',
                 dataType: 'String',
                 isNull: true,
-                isUnique: false
+                isUnique: false,
+                mainField: 'name'
             }
         },
         validations: {
@@ -23,6 +24,9 @@
                 required,
                 minLength: minLength(3)
 
+            },
+            mainField: {
+                required
             },
             nowEntity: {
                 required
@@ -34,7 +38,7 @@
             },
             isUnique: {
             },
-            form: ['nowEntity', 'nameField', 'dataType', 'isUnique', 'isNull']
+            form: ['mainField','nowEntity', 'nameField', 'dataType', 'isUnique', 'isNull']
         },
         mixins:[ValidateMixin],
         methods: {
@@ -49,7 +53,8 @@
                         name: this.nameField,
                         dataType: this.dataType,
                         isUnique: this.isUnique,
-                        isNull: this.isNull
+                        isNull: this.isNull,
+                        mainField: this.mainField
                     });
                 } else {
 

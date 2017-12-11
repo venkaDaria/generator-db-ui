@@ -6,7 +6,6 @@ import org.springframework.asm.FieldVisitor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.GenerationType;
 import java.util.List;
 
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
@@ -22,7 +21,8 @@ public class AsmService {
         final String className = StringUtils.capitalize(name);
 
         ClassWriter cw = new ClassWriter(0);
-        cw.visit(V1_8, ACC_PUBLIC, className, "", packageName + "/BaseEntity", null);
+        cw.visit(V1_8, ACC_PUBLIC, packageName + "/" + className, "",
+                 packageName.replace("impl", "") + "/BaseEntity;", null);
 
         cw.visitAnnotation("Llombok/Data;", true);
         cw.visitAnnotation("Ljavax/persistence/Entity;", true);
@@ -30,7 +30,7 @@ public class AsmService {
         FieldVisitor fv = cw.visitField(ACC_PRIVATE, "id", "J", null, null);
         fv.visitAnnotation("Ljavax/persistence/Id;", true);
         fv.visitAnnotation("Ljavax/persistence/GeneratedValue;", true)
-                .visit("strategy", GenerationType.AUTO);
+                .visitEnum("strategy", "Ljavax/persistence/GenerationType;", "AUTO");
         fv.visitEnd();
 
         cw.visitEnd();
