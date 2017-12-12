@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(exclude = {"exhibitions"})
+@EqualsAndHashCode(exclude = {"exhibitions"}, callSuper = false)
 @Entity(name = "Galleries")
 public class Gallery extends BaseEntity {
 
