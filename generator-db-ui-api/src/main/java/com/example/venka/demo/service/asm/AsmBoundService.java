@@ -10,7 +10,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
@@ -27,19 +26,19 @@ public class AsmBoundService {
         this.cw = cw;
     }
 
-    public boolean applyOption(String className, LinkedTreeMap<String, Object> bound) {
+    public String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
         if (Objects.equals(bound.get("option1"), className)) {
-            optionName = bound.get("option2").toString();
-            return true;
+            return bound.get("option2").toString();
         }
         if (Objects.equals(bound.get("option2"), className)) {
-            optionName = bound.get("option1").toString();
-            return true;
+            return bound.get("option1").toString();
         }
-        return false;
+        return "";
     }
 
-    public void createField(final LinkedTreeMap<String, Object> bound) {
+    public void createField(final String className, final LinkedTreeMap<String, Object> bound) {
+        optionName = applyOption(className, bound);
+
         switch (bound.get("bind").toString()) {
             case "0":
                 oneToOneCreate(bound);
@@ -94,7 +93,7 @@ public class AsmBoundService {
 
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
             fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Type.getDescriptor(HashSet.class),
-                    StringUtils.capitalize(optionName), null);
+                    null, null); // StringUtils.capitalize(optionName)
             fv.visitAnnotation("Ljavax/persistence/OneToMany;", true)
                     .visit("mappedBy", bound.get("option1"));
         } else {

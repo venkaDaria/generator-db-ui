@@ -1,6 +1,6 @@
-package com.example.demo.controllers;
+package com.example.venka.lab5.controllers;
 
-import com.example.demo.model.BaseEntity;
+import com.example.venka.lab5.model.BaseEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.ui.Model;

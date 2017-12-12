@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.venka.lab5.model;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;

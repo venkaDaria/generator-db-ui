@@ -44,8 +44,7 @@ public class AsmService {
 
         fields.forEach(field -> executeField(cw, fullClassName, field));
 
-        bounds.stream().filter(bound -> asmBoundService.applyOption(className, bound))
-                .forEach(asmBoundService::createField);
+        bounds.forEach(bound -> asmBoundService.createField(className, bound));
 
         cw.visitEnd();
         return cw.toByteArray();
