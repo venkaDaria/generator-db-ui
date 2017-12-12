@@ -19,13 +19,21 @@ public class JavaCreatorService {
 
     private final ModelService modelService;
 
-    public JavaCreatorService(final ModelService modelService) {
+    private final RepositoryService repositoryService;
+
+    private final ControllerService controllerService;
+
+    public JavaCreatorService(
+            final ModelService modelService,
+            final RepositoryService repositoryService,
+            final ControllerService controllerService) {
         this.modelService = modelService;
+        this.repositoryService = repositoryService;
+        this.controllerService = controllerService;
     }
 
-    // TODO: model (create files with property .name?)
-    // TODO: repo
-    // TODO: controller
+    // TODO: model + repo
+    // TODO: controller (not asm?)
     // TODO: check work
     // см. последнюю редакцию ДБ
     public void createFiles(final File source, final Map<String, Object> body) throws IOException {

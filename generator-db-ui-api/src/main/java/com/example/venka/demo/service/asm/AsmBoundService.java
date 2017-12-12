@@ -17,7 +17,7 @@ import static org.springframework.asm.Opcodes.ACC_PRIVATE;
 @Service
 public class AsmBoundService {
 
-    public static final String ID = "_id";
+    private static final String ID = "_id";
     private ClassWriter cw;
 
     private String optionName;
