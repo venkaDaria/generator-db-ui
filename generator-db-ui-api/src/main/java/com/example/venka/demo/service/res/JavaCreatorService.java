@@ -1,6 +1,8 @@
 package com.example.venka.demo.service.res;
 
+import com.example.venka.demo.service.res.sub.ControllerService;
 import com.example.venka.demo.service.res.sub.ModelService;
+import com.example.venka.demo.service.res.sub.RepositoryService;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -32,10 +34,6 @@ public class JavaCreatorService {
         this.controllerService = controllerService;
     }
 
-    // TODO: model + repo
-    // TODO: controller (not asm?)
-    // TODO: check work
-    // см. последнюю редакцию ДБ
     public void createFiles(final File source, final Map<String, Object> body) throws IOException {
         final String packageName = getPackageDir(body);
         final File directory = new File(source.getName() + MAIN_PACKAGE + packageName);
@@ -45,6 +43,8 @@ public class JavaCreatorService {
                 .forEach(path -> replacePackage(path, packageName));
 
         modelService.execute(directory, body);
+        repositoryService.execute(directory, body);
+        controllerService.execute(directory, body);
     }
 
     private void replacePackage(final Path path, final String packageName) {

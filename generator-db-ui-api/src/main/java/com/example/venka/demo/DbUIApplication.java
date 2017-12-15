@@ -11,6 +11,6 @@ public class DbUIApplication {
     }
 }
 
-// TODO: back-end (see CreatorService TODOs)
+// TODO: controller + см. последнюю редакцию ДБ
 // TODO: check work, final, front (unique names)
 // TODO: more validate

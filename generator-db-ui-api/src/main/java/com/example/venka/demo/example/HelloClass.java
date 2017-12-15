@@ -50,7 +50,7 @@ public class HelloClass {
         }
         cw.visitEnd();
 
-        //save bytecode into disk
+        //save byteCode into disk
         final String className = "temp/sample/HelloGen.class";
 
         Files.createDirectories(Paths.get("temp/sample/"));

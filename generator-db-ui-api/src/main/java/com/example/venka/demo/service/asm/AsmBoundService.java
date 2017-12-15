@@ -5,14 +5,21 @@ import jdk.internal.org.objectweb.asm.Type;
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.ClassWriter;
 import org.springframework.asm.FieldVisitor;
+import org.springframework.asm.MethodVisitor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.example.venka.demo.utils.Paths.CONTROLLERS;
+import static com.example.venka.demo.utils.Paths.REPOSITORIES;
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
+import static org.springframework.asm.Opcodes.ACC_PUBLIC;
+import static org.springframework.asm.Opcodes.GETFIELD;
+import static org.springframework.asm.Opcodes.GETSTATIC;
 
 @Service
 public class AsmBoundService {
@@ -22,22 +29,31 @@ public class AsmBoundService {
 
     private String optionName;
 
+    private Set<String> options = new HashSet<>();
+
+    private static void setMainInBound(final Object optionName, final AnnotationVisitor av) {
+        av.visit("mappedBy", optionName);
+        av.visitEnum("cascade", "Ljavax/persistence/CascadeType;", "ALL");
+    }
+
+    private static String toDescription(final String className) {
+        return "L" + StringUtils.capitalize(className) + ";";
+    }
+
     public void applyClassWriter(final ClassWriter cw) {
         this.cw = cw;
     }
 
-    public String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
-        if (Objects.equals(bound.get("option1"), className)) {
-            return bound.get("option2").toString();
-        }
-        if (Objects.equals(bound.get("option2"), className)) {
-            return bound.get("option1").toString();
-        }
-        return "";
+    public Set<String> getOptions() {
+        return options;
+    }
+
+    public void clearOptions() {
+        options.clear();
     }
 
     public void createField(final String className, final LinkedTreeMap<String, Object> bound) {
-        optionName = applyOption(className, bound);
+        optionName = applyOption(className.toLowerCase(), bound);
 
         switch (bound.get("bind").toString()) {
             case "0":
@@ -53,22 +69,34 @@ public class AsmBoundService {
                 manyToManyCreate(bound);
                 break;
         }
+
+        options.add(optionName);
     }
 
-    // TODO:
+    private String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
+        if (Objects.equals(bound.get("option1"), className)) {
+            return bound.get("option2").toString();
+        }
+        if (Objects.equals(bound.get("option2"), className)) {
+            return bound.get("option1").toString();
+        }
+        return "";
+    }
 
     private void manyToManyCreate(final LinkedTreeMap<String, Object> bound) {
         final FieldVisitor fv;
 
         if (Objects.equals(bound.get("option2"), optionName)) {
-            fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Type.getDescriptor(HashSet.class),
-                    StringUtils.capitalize(optionName), null);
+            optionName = optionName + "Set";
+
+            fv = cw.visitField(ACC_PRIVATE, optionName, Type.getDescriptor(HashSet.class),
+                    toDescription(optionName), null);
             fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true)
                     .visit("mappedBy", bound.get("option1") + "Set");
         } else {
-            fv = cw.visitField(ACC_PRIVATE, optionName, StringUtils.capitalize(optionName),
+            fv = cw.visitField(ACC_PRIVATE, optionName, toDescription(optionName),
                     null, null);
-            fv.visitAnnotation("Ljavax/persistence/ManyToOne;", true);
+            fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true);
             AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/JoinTable;", true);
             av.visit("name", optionName + bound.get("option2"));
             av.visitAnnotation("joinColumns", "Ljavax/persistence/JoinColumn;")
@@ -93,11 +121,12 @@ public class AsmBoundService {
 
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
             fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Type.getDescriptor(HashSet.class),
-                    null, null); // StringUtils.capitalize(optionName)
-            fv.visitAnnotation("Ljavax/persistence/OneToMany;", true)
-                    .visit("mappedBy", bound.get("option1"));
+                    toDescription(optionName), null);
+
+            final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);
+            setMainInBound(bound.get("option1"), av);
         } else {
-            fv = cw.visitField(ACC_PRIVATE, optionName, StringUtils.capitalize(optionName),
+            fv = cw.visitField(ACC_PRIVATE, optionName, toDescription(optionName),
                     null, null);
             fv.visitAnnotation("Ljavax/persistence/ManyToOne;", true)
                     .visitEnum("fetch", "Ljavax/persistence/FetchType;", "LAZY");
@@ -109,14 +138,35 @@ public class AsmBoundService {
     }
 
     private void oneToOneCreate(final LinkedTreeMap<String, Object> bound) {
-        final FieldVisitor fv = cw.visitField(ACC_PRIVATE, optionName, StringUtils.capitalize(optionName),
+        final FieldVisitor fv = cw.visitField(ACC_PRIVATE, optionName, toDescription(optionName),
                 null, null);
         final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToOne;", true);
 
-        if (Objects.equals(bound.get("option1"), optionName)) {
-            av.visitEnum("cascade", "Ljavax/persistence/CascadeType;", "ALL");
+        if (Objects.equals(bound.get("option2"), optionName)) {
+            setMainInBound(bound.get("option1"), av);
         }
 
         fv.visitEnd();
+    }
+
+    public String dependencyCreate(final String className, final String packageName,
+                                   final String constructorDescription, final LinkedTreeMap<String, Object> bound) {
+        optionName = applyOption(className.toLowerCase(), bound);
+        final String name = optionName + "Repository";
+        final String desc = "L" + packageName + REPOSITORIES + "/" + name + ";";
+        cw.visitField(ACC_PRIVATE, name, desc,null, null);
+
+        final String constructorDesc = constructorDescription != null ? add(desc, constructorDescription) : "()V";
+
+        final MethodVisitor constructor = cw.visitMethod(ACC_PUBLIC, "<init>",
+                constructorDesc, null, null);
+        constructor.visitFieldInsn(GETFIELD, packageName + CONTROLLERS, name, desc);
+        constructor.visitLdcInsn(desc);
+
+        return constructorDesc;
+    }
+
+    private static String add(String desc, String bound) {
+        return bound .replace(")V", "," + desc + ")V");
     }
 }
