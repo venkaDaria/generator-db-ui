@@ -27,11 +27,14 @@ import static com.example.venka.demo.utils.Paths.OLD_PACKAGE_POINT;
 @Service
 public class ControllerService implements ServiceExecutor {
 
-    @SuppressWarnings("unchecked")
+    private static final String MANY_BOUND = "%s.get%ss().add(%s)";
+    private static final String ONE_BOUND = "%s.set%s(%s)";
+
     @Override
     public void execute(final File directory, final Map<java.lang.String, Object> body) throws IOException {
         final Path exampleController = Paths.get(directory.getPath() + EXAMPLE_CONTROLLER);
 
+        @SuppressWarnings("unchecked")
         final List<LinkedTreeMap<String, Object>> entities =
                 (ArrayList<LinkedTreeMap<String, Object>>) body.get("entities");
 
@@ -72,7 +75,7 @@ public class ControllerService implements ServiceExecutor {
         replace(newController, Replaces.PARAMS, getParams(fields));
         replace(newController, Replaces.PARAMS_CREATE, getParamsCreate(fields));
         replace(newController, Replaces.CREATE, getCreate(fileName, fields));
-        replace(newController, Replaces.DEPS_STREAM, getDepsStream(bounds));
+        replace(newController, Replaces.DEPS_STREAM, getDepsStream(fileName, bounds));
         replace(newController, Replaces.DEPS, getDeps(fileName, bounds));
     }
 
@@ -96,7 +99,7 @@ public class ControllerService implements ServiceExecutor {
             final BiConsumer<StringBuilder, LinkedTreeMap<String, Object>> consumer
     ) {
         final StringBuilder sb = new StringBuilder();
-        linkedTreeMapList.forEach(bound -> consumer.accept(sb, bound));
+        linkedTreeMapList.forEach(linkedTreeMap -> consumer.accept(sb, linkedTreeMap));
         return sb.toString();
     }
 
@@ -104,8 +107,87 @@ public class ControllerService implements ServiceExecutor {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append(", ").append(option));
     }
 
-    private String getDepsStream(final List<LinkedTreeMap<String, Object>> bounds) {
-        return null;
+    private String getDepsStream(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
+        final StringBuilder sb = new StringBuilder();
+        bounds.forEach(bound -> {
+            final String bind = bound.get("bind").toString();
+            final String classNameLowerCase = className.toLowerCase();
+            final String option = applyOption(classNameLowerCase, bound);
+            final String capitalizeOption = StringUtils.capitalize(option);
+
+            switch (bind) {
+                case "0":
+                    setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    break;
+                case "1":
+                    setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    break;
+                case "2":
+                    setManyToOneBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    break;
+                case "3":
+                    setManyToManyBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    break;
+            }
+        });
+        return sb.toString();
+    }
+
+    private void setManyToManyBound(final StringBuilder sb, final String classNameLowerCase,
+                                    final String className, final String option, final String capitalizeOption) {
+        setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption, MANY_BOUND);
+    }
+
+    private void setOneToManyBound(final StringBuilder sb, final String classNameLowerCase,
+                                    final String className, final String option, final String capitalizeOption) {
+        setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption, ONE_BOUND);
+    }
+
+    private void setOneToManyBound(final StringBuilder sb, final String classNameLowerCase,
+                                   final String className, final String option, final String capitalizeOption,
+                                   final String stringFormat) {
+        sb.append(String.format("Arrays.stream(%1$ss).forEach(%1$sId -> %1$sRepository.findById(%1$sId)", option))
+                .append(System.lineSeparator());
+        sb.append(Replaces.TAB).append(
+                String.format(".ifPresent(%s -> {", option)
+        ).append(System.lineSeparator());
+        sb.append(Replaces.TAB).append(Replaces.TAB).append(
+                String.format("%s.get%s().add(%s);", classNameLowerCase, capitalizeOption, option)
+        ).append(System.lineSeparator());
+        sb.append(Replaces.TAB).append(Replaces.TAB).append(
+                String.format(stringFormat, option, className, classNameLowerCase)
+        ).append(System.lineSeparator());
+        sb.append(Replaces.TAB).append("}").append(System.lineSeparator());
+        sb.append("));").append(System.lineSeparator());
+    }
+
+    private void setManyToOneBound(final StringBuilder sb, final String classNameLowerCase,
+                                   final String className, final String option, final String capitalizeOption) {
+        setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption, "%s.get%ss().add(%s)");
+    }
+
+
+    private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
+                                  final String className, final String option, final String capitalizeOption) {
+        setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption, "%s.set%s(%s)");
+    }
+
+    private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
+                                  final String className, final String option, final String capitalizeOption,
+                                  final String stringFormat) {
+        sb.append(String.format("%1$sRepository.findById(%1$s).ifPresent(%1$sEntity -> {", option))
+                .append(System.lineSeparator());
+        sb.append(Replaces.TAB).append("model.addAttribute(\"isOkay\");").append(System.lineSeparator());
+        sb.append(Replaces.TAB).append(
+                String.format(stringFormat, classNameLowerCase, capitalizeOption, option)
+        ).append(System.lineSeparator());
+        sb.append(Replaces.TAB).append(
+                String.format("%s.set%s(%s)", option, className, classNameLowerCase)
+        ).append(System.lineSeparator());
+        sb.append(Replaces.TAB).append(
+                String.format("%1$sRepository.save(%1$s);", option)
+        ).append(System.lineSeparator());
+        sb.append("});").append(System.lineSeparator());
     }
 
     private String getCreate(final String className, final List<LinkedTreeMap<String, Object>> fields) {
@@ -117,16 +199,48 @@ public class ControllerService implements ServiceExecutor {
                 .append(System.lineSeparator());
         sb.append(System.lineSeparator());
 
-        fields.forEach(field -> sb.append(Replaces.TAB).append(className).append(Replaces.POINT)
-                .append("set").append(StringUtils.capitalize(field.get("name").toString()))
-                .append("(").append(field.get("name").toString())
-                .append(")").append(Replaces.STOP).append(System.lineSeparator()));
+        fields.forEach(field -> {
+            createFieldSetter(className, sb, field);
+        });
 
         sb.append(System.lineSeparator());
         sb.append(Replaces.TAB).append("return ").append(className.toLowerCase()).append(Replaces.STOP)
                 .append(System.lineSeparator());
         sb.append("}");
         return sb.toString();
+    }
+
+    private void createFieldSetter(final String className, final StringBuilder sb, final LinkedTreeMap<String, Object> field) {
+        String newTab = Replaces.TAB;
+        String value = field.get("name").toString();
+
+        final String dataType = field.get("dataType").toString();
+        switch (dataType) {
+            case "Integer":
+            case "Double":
+                value = dataType + ".valueOf(" + value + ")";
+                break;
+            case "LocalDateTime":
+            case "DateTime":
+                value = "DateTransformer.parse(" + value + ")";
+                break;
+        }
+
+        final boolean throwException = !dataType.equals("String");
+        if (throwException) {
+            sb.append(Replaces.TAB).append("try {").append(System.lineSeparator());
+            newTab += Replaces.TAB;
+        }
+
+        sb.append(newTab).append(className).append(Replaces.POINT)
+                .append("set").append(StringUtils.capitalize(field.get("name").toString()))
+                .append("(").append(value).append(")").append(Replaces.STOP)
+                .append(System.lineSeparator());
+
+        if (throwException) {
+            sb.append(Replaces.TAB).append("} catch (final Exception ignored) {").append(System.lineSeparator());
+            sb.append(Replaces.TAB).append("}").append(System.lineSeparator());
+        }
     }
 
     private String getParamsCreate(final List<LinkedTreeMap<String, Object>> fields) {
