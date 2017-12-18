@@ -22,6 +22,16 @@ public final class Replaces {
     public static final String DEPS_STREAM = "\\[deps-create\\]";
     public static final String DEPS = "\\[deps\\]";
 
+    // punctuation
+    public static final String TAB = "    ";
+    public static final String SPACE = " ";
+    public static final String EQUAL = " = ";
+    public static final String STOP = ";";
+    public static final String POINT = ".";
+
+    // keywords
+    public static final String FINAL = ", final ";
+
     private Replaces() {
         // empty
     }

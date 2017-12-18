@@ -22,7 +22,6 @@
             nameField: {
                 required,
                 minLength: minLength(3)
-
             },
             mainField: {
                 required
