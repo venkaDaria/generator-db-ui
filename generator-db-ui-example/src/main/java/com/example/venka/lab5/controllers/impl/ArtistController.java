@@ -67,6 +67,12 @@ public class ArtistController extends BaseController<Artist> {
         return "redirect:/artist/";
     }
 
+    @GetMapping({"/save/{id}", "/save"})
+    public String save(final Model model, @PathVariable final Optional<Long> id) {
+        return super.save(model, id, Artist.class, artistRepository,
+                new String[]{"paintings"}, paintingRepository);
+    }
+
     @PostMapping("/rm/{id}")
     public String deleteArtist(final Model model, @PathVariable final long id) {
         artistRepository.deleteById(id);
@@ -78,11 +84,5 @@ public class ArtistController extends BaseController<Artist> {
     @GetMapping("/confirm/{id}")
     public String confirm(final Model model, @PathVariable final long id) {
         return super.confirm(model, id, artistRepository);
-    }
-
-    @GetMapping({"/save/{id}", "/save"})
-    public String save(final Model model, @PathVariable final Optional<Long> id) {
-        return super.save(model, id, Artist.class, artistRepository,
-                new String[]{"paintings"}, paintingRepository);
     }
 }

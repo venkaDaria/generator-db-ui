@@ -11,6 +11,5 @@ public class DbUIApplication {
     }
 }
 
-// TODO: controller + см. последнюю редакцию ДБ
-// TODO: check work, final, front (unique names)
-// TODO: more validate
+// TODO: controller + см. последнюю редакцию ДБ - Вт
+// TODO: check work, final, front, more validate - Ср

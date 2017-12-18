@@ -154,35 +154,4 @@ public class AsmService {
 
         return signature.toString();
     }
-
-    public byte[] createController(final String className, final String packageName,
-                                   final List<LinkedTreeMap<String, Object>> fields,
-                                   final List<LinkedTreeMap<String, Object>> bounds) throws IOException {
-        final ClassWriter classWriter = new ClassWriter(0);
-
-        final String fullClassName = packageName + CONTROLLERS + "/" + className + "Controller";
-        final byte[] byteCode = FileUtils.readFileToByteArray(new File(fullClassName));
-        final ClassReader cr = new ClassReader(byteCode);
-
-        editController(classWriter, className, packageName, fields, bounds);
-
-        cr.accept(classWriter, 0);
-        return classWriter.toByteArray();
-    }
-
-    private void editController(
-            final ClassWriter classWriter,
-            final String className,
-            final String packageName,
-            final List<LinkedTreeMap<String, Object>> fields,
-            final List<LinkedTreeMap<String, Object>> bounds
-    ) {
-        asmBoundService.applyClassWriter(classWriter);
-
-        String constructorDescription = null;
-        for (LinkedTreeMap<String, Object> bound : bounds) {
-            constructorDescription = asmBoundService.dependencyCreate(className, packageName,
-                    constructorDescription, bound);
-        }
-    }
 }

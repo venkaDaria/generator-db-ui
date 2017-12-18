@@ -1,7 +1,7 @@
 package com.example.demo.controllers.impl;
 
-import com.example.demo.model.impl.Dasd;
-import com.example.demo.repositories.DasdRepository;
+import com.example.demo.model.impl.Edadwad;
+import com.example.demo.repositories.EdadwadRepository;
 import com.example.demo.controllers.BaseController;
 import com.example.demo.utils.DateTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,52 +13,52 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/dasd")
-public class DasdController extends BaseController<Dasd> {
+@RequestMapping("/edadwad")
+public class EdadwadController extends BaseController<Edadwad> {
 
-    private final DasdRepository dasdRepository;
+    private final EdadwadRepository edadwadRepository;
 
     @Autowired
-    public DasdController(final DasdRepository dasdRepository) {
-        this.dasdRepository = dasdRepository;
+    public EdadwadController(final EdadwadRepository edadwadRepository) {
+        this.edadwadRepository = edadwadRepository;
     }
 
     @GetMapping("/")
     public String getAll(final Model model) {
-        setAttributes(model, dasdRepository, getClass());
+        setAttributes(model, edadwadRepository, getClass());
         return "table";
     }
 
     @PostMapping({"/{id}", "/"})
     public String savePost(final Model model, @PathVariable final Optional<Long> id) {
-        final Dasd dasd = create();
+        final Edadwad edadwad = create();
 
-        id.ifPresent(dasd::setId);
+        id.ifPresent(edadwad::setId);
 
-        dasdRepository.save(dasd);
-        setAttributes(model, dasdRepository, getClass());
-        return "redirect:/dasd/";
+        edadwadRepository.save(edadwad);
+        setAttributes(model, edadwadRepository, getClass());
+        return "redirect:/edadwad/";
     }
 
     @GetMapping({"/save/{id}", "/save"})
     public String saveGet(final Model model, @PathVariable final Optional<Long> id) {
-        return super.save(model, id, getClass(), dasdRepository, new String[]{});
+        return super.save(model, id, getClass(), edadwadRepository, new String[]{});
     }
 
     @PostMapping("/rm/{id}")
     public String delete(final Model model, @PathVariable final long id) {
-        dasdRepository.deleteById(id);
+        edadwadRepository.deleteById(id);
 
-        setAttributes(model, dasdRepository, getClass());
-        return "redirect:/dasd/";
+        setAttributes(model, edadwadRepository, getClass());
+        return "redirect:/edadwad/";
     }
 
     @GetMapping("/confirm/{id}")
     public String confirm(final Model model, @PathVariable final long id) {
-        return super.confirm(model, id, dasdRepository);
+        return super.confirm(model, id, edadwadRepository);
     }
 
-    public Dasd create() {
-        return new Dasd();
+    public Edadwad create() {
+        return new Edadwad();
     }
 }

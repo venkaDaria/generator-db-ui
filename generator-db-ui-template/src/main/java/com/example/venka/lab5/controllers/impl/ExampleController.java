@@ -17,10 +17,12 @@ import java.util.Optional;
 public class ExampleController extends BaseController<Example> {
 
     private final ExampleRepository exampleRepository;
+    [fields]
 
     @Autowired
-    public ExampleController(final ExampleRepository exampleRepository) {
+    public ExampleController(final ExampleRepository exampleRepository[constructor]) {
         this.exampleRepository = exampleRepository;
+        [constructor-fields]
     }
 
     @GetMapping("/")
@@ -30,19 +32,23 @@ public class ExampleController extends BaseController<Example> {
     }
 
     @PostMapping({"/{id}", "/"})
-    public String savePost(final Model model, @PathVariable final Optional<Long> id) {
-        final Example example = create();
+    public String savePost(final Model model, @PathVariable final Optional<Long> id[params]) {
+        final Example example = create([params-create]);
 
         id.ifPresent(example::setId);
+
+        [deps-stream]
 
         exampleRepository.save(example);
         setAttributes(model, exampleRepository, getClass());
         return "redirect:/example/";
     }
 
+    [create]
+
     @GetMapping({"/save/{id}", "/save"})
     public String saveGet(final Model model, @PathVariable final Optional<Long> id) {
-        return super.save(model, id, getClass(), exampleRepository, new String[]{});
+        return super.save(model, id, getClass(), exampleRepository[deps]);
     }
 
     @PostMapping("/rm/{id}")
@@ -56,9 +62,5 @@ public class ExampleController extends BaseController<Example> {
     @GetMapping("/confirm/{id}")
     public String confirm(final Model model, @PathVariable final long id) {
         return super.confirm(model, id, exampleRepository);
-    }
-
-    public Example create() {
-        return new Example();
     }
 }

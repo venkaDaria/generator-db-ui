@@ -15,7 +15,6 @@
                 nameField: '',
                 dataType: 'String',
                 isNull: true,
-                isUnique: false,
                 mainField: 'name'
             }
         },
@@ -36,9 +35,7 @@
             },
             isNull: {
             },
-            isUnique: {
-            },
-            form: ['mainField','nowEntity', 'nameField', 'dataType', 'isUnique', 'isNull']
+            form: ['mainField','nowEntity', 'nameField', 'dataType', 'isNull']
         },
         mixins:[ValidateMixin],
         methods: {
@@ -52,7 +49,6 @@
                         parent: this.nowEntity,
                         name: this.nameField,
                         dataType: this.dataType,
-                        isUnique: this.isUnique,
                         isNull: this.isNull
                     });
                 } else {

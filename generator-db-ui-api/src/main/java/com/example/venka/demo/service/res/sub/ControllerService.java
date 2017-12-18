@@ -27,12 +27,6 @@ import static com.example.venka.demo.utils.Paths.OLD_PACKAGE_POINT;
 @Service
 public class ControllerService implements ServiceExecutor {
 
-    private final AsmService asmService;
-
-    public ControllerService(final AsmService asmService) {
-        this.asmService = asmService;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void execute(final File directory, final Map<java.lang.String, Object> body) throws IOException {
@@ -56,14 +50,27 @@ public class ControllerService implements ServiceExecutor {
                 replace(newController, "(?<=this.)example", entityName);
                 replace(newController, "Example", className);
 
-                byte[] byteCode = asmService.createController(entityName, getPackageDir(body), filterFields(body, entityName),
-                        filterBounds(body, entityName));
-                writeTo(newController.toFile(), entityName, byteCode);
+                changeController(newController, filterFields(body, entityName), filterBounds(body, entityName));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         });
 
         Files.deleteIfExists(exampleController);
+    }
+
+    private void changeController(
+            final Path newController,
+            final List<LinkedTreeMap<String, Object>> fields,
+            final List<LinkedTreeMap<String, Object>> bounds
+    ) {
+        // fields
+        // constructor
+        // constructor-fields
+        // params
+        // params-create
+        // create
+        // deps-stream
+        // deps
     }
 }

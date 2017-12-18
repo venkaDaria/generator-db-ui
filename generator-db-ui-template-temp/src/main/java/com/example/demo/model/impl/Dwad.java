@@ -7,22 +7,23 @@ import java.lang.annotation.*;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = false, exclude = { "sdfv" })
-public class Dasd extends BaseEntity
+@EqualsAndHashCode(callSuper = false, exclude = { "edadwad" })
+public class Dwad extends BaseEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String fsfsdf;
-    @OneToOne
-    private Sdfv sdfv;
+    private String dsa;
+    private String dsadadad;
+    @OneToMany(mappedBy = "dwad", cascade = CascadeType.ALL)
+    private Edadwad edadwadSet;
     
     public String getName() {
-        return this.fsfsdf;
+        return this.dsa;
     }
     
     @Override
     public String toString() {
-        return this.fsfsdf;
+        return this.dsa;
     }
 }
