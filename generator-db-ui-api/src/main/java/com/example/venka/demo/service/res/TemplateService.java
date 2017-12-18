@@ -1,5 +1,6 @@
 package com.example.venka.demo.service.res;
 
+import com.example.venka.demo.utils.Replaces;
 import com.example.venka.demo.utils.db.DataBaseUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
@@ -64,8 +65,8 @@ public class TemplateService {
         final File fileFooter = new File(resultFile.getPath() + FOOTER);
         final File fileHeader = new File(resultFile.getPath() + HEADER);
 
-        replace(fileFooter.toPath(), "\\[footer\\]", footer);
-        replace(fileHeader.toPath(), "\\[header\\]", header);
+        replace(fileFooter.toPath(), Replaces.FOOTER, footer);
+        replace(fileHeader.toPath(), Replaces.HEADER, header);
     }
 
     private void setMetadata() throws IOException {
@@ -77,13 +78,13 @@ public class TemplateService {
 
         final File file = new File(resultFile.getPath() + PROPERTIES);
         final Path path = file.toPath();
-        replace(path, "\\[username\\]", userName);
-        replace(path, "\\[password\\]", password);
-        replace(path, "\\[url\\]", dataBaseUtils.getUrl(dataBase, artifactId));
-        replace(path, "\\[platform\\]", dataBaseUtils.getPlatform(dataBase));
+        replace(path, Replaces.USERNAME, userName);
+        replace(path, Replaces.PASSWORD, password);
+        replace(path, Replaces.URL, dataBaseUtils.getUrl(dataBase, artifactId));
+        replace(path, Replaces.PLATFORM, dataBaseUtils.getPlatform(dataBase));
 
         final Path pathGradle = new File(resultFile.getPath() + "/build.gradle").toPath();
-        replace(pathGradle, "\\[group\\]", "'" + groupId + "'");
-        replace(pathGradle, "\\[compile\\]", dataBaseUtils.getDependencies(dataBase));
+        replace(pathGradle, Replaces.GROUP, "'" + groupId + "'");
+        replace(pathGradle, Replaces.COMPILE, dataBaseUtils.getDependencies(dataBase));
     }
 }

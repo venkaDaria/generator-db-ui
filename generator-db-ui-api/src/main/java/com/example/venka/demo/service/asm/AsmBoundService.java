@@ -1,5 +1,6 @@
 package com.example.venka.demo.service.asm;
 
+import com.example.venka.demo.utils.Types;
 import com.google.gson.internal.LinkedTreeMap;
 import jdk.internal.org.objectweb.asm.Type;
 import org.springframework.asm.AnnotationVisitor;
@@ -19,7 +20,6 @@ import static com.example.venka.demo.utils.Paths.REPOSITORIES;
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
 import static org.springframework.asm.Opcodes.ACC_PUBLIC;
 import static org.springframework.asm.Opcodes.GETFIELD;
-import static org.springframework.asm.Opcodes.GETSTATIC;
 
 @Service
 public class AsmBoundService {
@@ -38,6 +38,10 @@ public class AsmBoundService {
 
     private static String toDescription(final String className) {
         return "L" + StringUtils.capitalize(className) + ";";
+    }
+
+    private static String add(String desc, String bound) {
+        return bound.replace(")V", "," + desc + ")V");
     }
 
     public void applyClassWriter(final ClassWriter cw) {
@@ -89,8 +93,7 @@ public class AsmBoundService {
         if (Objects.equals(bound.get("option2"), optionName)) {
             optionName = optionName + "Set";
 
-            fv = cw.visitField(ACC_PRIVATE, optionName, Type.getDescriptor(HashSet.class),
-                    toDescription(optionName), null);
+            fv = cw.visitField(ACC_PRIVATE, optionName, Types.SET, toDescription(optionName), null);
             fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true)
                     .visit("mappedBy", bound.get("option1") + "Set");
         } else {
@@ -120,8 +123,7 @@ public class AsmBoundService {
         final FieldVisitor fv;
 
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
-            fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Type.getDescriptor(HashSet.class),
-                    toDescription(optionName), null);
+            fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET, toDescription(optionName), null);
 
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);
             setMainInBound(bound.get("option1"), av);
@@ -154,7 +156,7 @@ public class AsmBoundService {
         optionName = applyOption(className.toLowerCase(), bound);
         final String name = optionName + "Repository";
         final String desc = "L" + packageName + REPOSITORIES + "/" + name + ";";
-        cw.visitField(ACC_PRIVATE, name, desc,null, null);
+        cw.visitField(ACC_PRIVATE, name, desc, null, null);
 
         final String constructorDesc = constructorDescription != null ? add(desc, constructorDescription) : "()V";
 
@@ -164,9 +166,5 @@ public class AsmBoundService {
         constructor.visitLdcInsn(desc);
 
         return constructorDesc;
-    }
-
-    private static String add(String desc, String bound) {
-        return bound .replace(")V", "," + desc + ")V");
     }
 }
