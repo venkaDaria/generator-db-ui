@@ -77,7 +77,7 @@ public class AsmBoundService {
         options.add(optionName);
     }
 
-    private String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
+    public static String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
         if (Objects.equals(bound.get("option1"), className)) {
             return bound.get("option2").toString();
         }

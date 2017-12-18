@@ -2,6 +2,7 @@ package com.example.venka.demo.service.res.sub;
 
 import com.example.venka.demo.utils.Replaces;
 import com.google.gson.internal.LinkedTreeMap;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
@@ -13,7 +14,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
+import static com.example.venka.demo.service.asm.AsmBoundService.applyOption;
 import static com.example.venka.demo.utils.FileUtils.getJavaName;
 import static com.example.venka.demo.utils.FileUtils.replace;
 import static com.example.venka.demo.utils.JsonMapper.filterBounds;
@@ -62,18 +65,41 @@ public class ControllerService implements ServiceExecutor {
             final List<LinkedTreeMap<String, Object>> fields,
             final List<LinkedTreeMap<String, Object>> bounds
     ) throws IOException {
-        replace(newController, Replaces.FIELDS, getFields(bounds));
-        replace(newController, Replaces.CONSTRUCTOR, getConstructor(bounds));
-        replace(newController, Replaces.CONSTRUCTOR_FIELDS, getConstructorFields(bounds));
+        final String fileName = newController.getFileName().toString();
+
+        replace(newController, Replaces.FIELDS, getFields(fileName, bounds));
+        replace(newController, Replaces.CONSTRUCTOR, getConstructor(fileName, bounds));
+        replace(newController, Replaces.CONSTRUCTOR_FIELDS, getConstructorFields(fileName, bounds));
         replace(newController, Replaces.PARAMS, getParams(bounds));
         replace(newController, Replaces.PARAMS_CREATE, getParamsCreate(bounds));
         replace(newController, Replaces.CREATE, getCreate(bounds));
         replace(newController, Replaces.DEPS_STREAM, getDepsStream(bounds));
-        replace(newController, Replaces.DEPS, getDeps(bounds));
+        replace(newController, Replaces.DEPS, getDeps(fileName, bounds));
     }
 
-    private String getDeps(final List<LinkedTreeMap<String, Object>> bounds) {
-        return null;
+    @NotNull
+    private static String getStringWithConsumer(
+            final String className,
+            final List<LinkedTreeMap<String, Object>> bounds,
+            final BiConsumer<StringBuilder, String> consumer
+    ) {
+        final StringBuilder sb = new StringBuilder();
+
+        bounds.forEach(bound -> {
+            final String option = getRepository(className, bound);
+            consumer.accept(sb, option);
+        });
+
+        return sb.toString();
+    }
+
+    @NotNull
+    private static String getRepository(final String className, final LinkedTreeMap<String, Object> bound) {
+        return applyOption(className.toLowerCase(), bound) + "Repository";
+    }
+
+    private String getDeps(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
+        return getStringWithConsumer(className, bounds, (sb, option) -> sb.append(", ").append(option));
     }
 
     private String getDepsStream(final List<LinkedTreeMap<String, Object>> bounds) {
@@ -92,15 +118,18 @@ public class ControllerService implements ServiceExecutor {
         return null;
     }
 
-    private String getConstructorFields(final List<LinkedTreeMap<String, Object>> bounds) {
-        return null;
+    private String getConstructorFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
+        return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("this.").append(option)
+                .append(" = ").append(option).append(option).append(";").append(System.lineSeparator()));
     }
 
-    private String getConstructor(final List<LinkedTreeMap<String, Object>> bounds) {
-        return null;
+    private String getConstructor(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
+        return getStringWithConsumer(className, bounds, (sb, option) -> sb.append(", final")
+                .append(StringUtils.capitalize(option)).append(option));
     }
 
-    private String getFields(final List<LinkedTreeMap<String, Object>> bounds) {
-        return null;
+    private String getFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
+        return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("private final ")
+                .append(StringUtils.capitalize(option)).append(option).append(";").append(System.lineSeparator()));
     }
 }
