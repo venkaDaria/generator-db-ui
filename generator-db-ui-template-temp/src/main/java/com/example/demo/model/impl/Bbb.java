@@ -2,29 +2,30 @@ package com.example.demo.model.impl;
 
 import com.example.demo.model.*;
 import lombok.*;
+import java.time.*;
 import javax.persistence.*;
 import java.lang.annotation.*;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = false, exclude = { "dwad" })
-public class Edadwad extends BaseEntity
+@EqualsAndHashCode(callSuper = false, exclude = { "aaa" })
+public class Bbb extends BaseEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String das;
-    private String dasds;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dwad_id")
-    private Dwad dwad;
+    private String ccc;
+    private LocalDate ddd;
+    private int eee;
+    @OneToMany(mappedBy = "aaa", cascade = CascadeType.ALL)
+    private Aaa aaaSet;
     
     public String getName() {
-        return this.dasds;
+        return (String)this.eee;
     }
     
     @Override
     public String toString() {
-        return this.dasds;
+        return (String)this.eee;
     }
 }

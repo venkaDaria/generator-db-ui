@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.Optional;
 
+[import]
+
 @Controller
 @RequestMapping("/example")
 public class ExampleController extends BaseController<Example> {

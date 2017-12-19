@@ -14,13 +14,14 @@ public final class Replaces {
 
     // controller
     public static final String FIELDS = "\\[fields\\]";
-    public static final String CONSTRUCTOR = "\\constructor\\]";
-    public static final String CONSTRUCTOR_FIELDS = "\\[constructor-fields\\]";
+    public static final String CONSTRUCTOR = "\\[constructor\\]";
+    public static final String CONSTRUCTOR_FIELDS = "\\[constructor\\-fields\\]";
     public static final String PARAMS = "\\[params\\]";
-    public static final String PARAMS_CREATE = "[params-create\\]";
+    public static final String PARAMS_CREATE = "\\[params\\-create\\]";
     public static final String CREATE = "\\[create\\]";
-    public static final String DEPS_STREAM = "\\[deps-create\\]";
+    public static final String DEPS_STREAM = "\\[deps\\-stream\\]";
     public static final String DEPS = "\\[deps\\]";
+    public static final String IMPORT = "\\[import\\]";
 
     // punctuation
     public static final String TAB = "    ";

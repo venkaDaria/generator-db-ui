@@ -22,6 +22,7 @@ import static com.example.venka.demo.utils.JsonMapper.filterBounds;
 import static com.example.venka.demo.utils.JsonMapper.filterFields;
 import static com.example.venka.demo.utils.Paths.CONTROLLERS;
 import static com.example.venka.demo.utils.Paths.EXAMPLE_CONTROLLER;
+import static com.example.venka.demo.utils.Paths.MODEL_POINT;
 import static com.example.venka.demo.utils.Paths.OLD_PACKAGE_POINT;
 
 @Service
@@ -53,9 +54,9 @@ public class ControllerService implements ServiceExecutor {
                 replace(newController, "(?<=this.)example", entityName);
                 replace(newController, "Example", className);
 
-                changeController(newController, filterFields(body, entityName), filterBounds(body, entityName));
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
+                changeController(newController, packageName, filterFields(body, entityName), filterBounds(body, entityName));
+            } catch (final IOException ex) {
+                System.out.println(ex.getMessage());
             }
         });
 
@@ -64,10 +65,11 @@ public class ControllerService implements ServiceExecutor {
 
     private void changeController(
             final Path newController,
+            final String packageName,
             final List<LinkedTreeMap<String, Object>> fields,
             final List<LinkedTreeMap<String, Object>> bounds
     ) throws IOException {
-        final String fileName = newController.getFileName().toString();
+        final String fileName = newController.getFileName().toString().replace(".java", "");
 
         replace(newController, Replaces.FIELDS, getFields(fileName, bounds));
         replace(newController, Replaces.CONSTRUCTOR, getConstructor(fileName, bounds));
@@ -77,6 +79,13 @@ public class ControllerService implements ServiceExecutor {
         replace(newController, Replaces.CREATE, getCreate(fileName, fields));
         replace(newController, Replaces.DEPS_STREAM, getDepsStream(fileName, bounds));
         replace(newController, Replaces.DEPS, getDeps(fileName, bounds));
+        replace(newController, Replaces.IMPORT, getImport(fileName, packageName, bounds));
+    }
+
+    private String getImport(final String className, final String packageName, final List<LinkedTreeMap<String, Object>> bounds) {
+        return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("import ").append(packageName)
+                .append(MODEL_POINT).append(Replaces.POINT).append(StringUtils.capitalize(option))
+                .append(";").append(System.lineSeparator()));
     }
 
     private static String getStringWithConsumer(
@@ -91,7 +100,7 @@ public class ControllerService implements ServiceExecutor {
     }
 
     private static String getRepository(final String className, final LinkedTreeMap<String, Object> bound) {
-        return applyOption(className.toLowerCase(), bound) + "Repository";
+        return applyOption(className.replace("Controller", "").toLowerCase(), bound) + "Repository";
     }
 
     private static String getStringWithConsumer(
@@ -192,16 +201,14 @@ public class ControllerService implements ServiceExecutor {
 
     private String getCreate(final String className, final List<LinkedTreeMap<String, Object>> fields) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("private ").append(className).append(" create(").append(getParams(fields)).append(") {")
+        sb.append("private ").append(className).append(" create(").append(getParams(fields).substring(2)).append(") {")
                 .append(System.lineSeparator());
         sb.append(Replaces.TAB).append(className).append(Replaces.SPACE).append(className.toLowerCase()).append(Replaces.SPACE)
                 .append(Replaces.EQUAL).append("new ").append(className).append("()").append(Replaces.STOP)
                 .append(System.lineSeparator());
         sb.append(System.lineSeparator());
 
-        fields.forEach(field -> {
-            createFieldSetter(className, sb, field);
-        });
+        fields.forEach(field -> createFieldSetter(className, sb, field));
 
         sb.append(System.lineSeparator());
         sb.append(Replaces.TAB).append("return ").append(className.toLowerCase()).append(Replaces.STOP)
@@ -254,16 +261,17 @@ public class ControllerService implements ServiceExecutor {
 
     private String getConstructorFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("this.").append(option)
-                .append(Replaces.EQUAL).append(option).append(option).append(Replaces.STOP).append(System.lineSeparator()));
+                .append(Replaces.EQUAL).append(option).append(Replaces.STOP).append(System.lineSeparator()));
     }
 
     private String getConstructor(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append(Replaces.FINAL)
-                .append(StringUtils.capitalize(option)).append(option));
+                .append(StringUtils.capitalize(option)).append(Replaces.SPACE).append(option));
     }
 
     private String getFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("private final ")
-                .append(StringUtils.capitalize(option)).append(option).append(";").append(System.lineSeparator()));
+                .append(StringUtils.capitalize(option)).append(Replaces.SPACE).append(option)
+                .append(";").append(System.lineSeparator()));
     }
 }
