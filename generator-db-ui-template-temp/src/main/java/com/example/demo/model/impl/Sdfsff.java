@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.*;
 import java.util.*;
 import javax.persistence.*;
+import org.thymeleaf.util.*;
 import java.lang.annotation.*;
 
 @Data
@@ -20,8 +21,12 @@ public class Sdfsff extends BaseEntity
     @OneToMany(mappedBy = "fdsad", cascade = CascadeType.ALL)
     private Set<Fdsad> fdsadSet;
     
-    public String getName();
+    public String getName() {
+        return StringUtils.toString(this.ddd);
+    }
     
     @Override
-    public String toString();
+    public String toString() {
+        return this.getName();
+    }
 }

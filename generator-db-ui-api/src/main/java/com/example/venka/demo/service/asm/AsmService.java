@@ -20,6 +20,7 @@ import static com.example.venka.demo.utils.Paths.CRUD_REPOSITORY;
 import static com.example.venka.demo.utils.Paths.MODEL;
 import static com.example.venka.demo.utils.Paths.REPOSITORIES;
 import static com.example.venka.demo.utils.Types.STR_SUPPLIER;
+import static org.springframework.asm.Opcodes.ACC_ABSTRACT;
 import static org.springframework.asm.Opcodes.ACC_INTERFACE;
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
 import static org.springframework.asm.Opcodes.ACC_PUBLIC;

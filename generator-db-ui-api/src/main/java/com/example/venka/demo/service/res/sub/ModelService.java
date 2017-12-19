@@ -34,7 +34,7 @@ public class ModelService implements ServiceExecutor {
 
         entities.forEach(entity -> {
             final String entityName = entity.get("name").toString();
-            final byte[] byteCode = asmService.createModel(entityName, getPackageDir(body) + MODEL,
+            final byte[] byteCode = asmService.createModel(entityName, getPackageDir(body).substring(1) + MODEL,
                     filterFields(body, entityName), filterBounds(body, entityName));
 
             try {
