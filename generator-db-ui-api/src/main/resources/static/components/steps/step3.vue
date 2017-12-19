@@ -56,12 +56,14 @@
             }, saveMainField() {
                 let isOkay = this.validate();
                 if (isOkay) {
-                    this.fields.forEach(field => {
-                        field['isMain'] = field.parent === this.nowEntity && field.name === this.mainField;
+                    this.fields.filter(field => field.parent === this.nowEntity).forEach(field => {
+                        field['isMain'] = field.name === this.mainField;
                     })
                 } else {
 
                 }
+            }, isChecked() {
+                return this.fields.find(field => field.name === this.mainField).isMain;
             }
         }
     }

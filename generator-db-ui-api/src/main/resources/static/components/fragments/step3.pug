@@ -7,9 +7,9 @@ div
 
     section.form-group(v-bind:class="{ 'has-error': $v.mainField.$error }")
         div(v-for='field in fields', v-if='field.parent == nowEntity')
-            label {{ field.name }} {{ field.dataType }} {{ field.isUnique ? 'Unique' : 'NotUnique'}} {{ field.isNull ? 'Null' : 'NotNull' }}
+            label {{ field.name }} {{ field.dataType }} {{ field.isNull ? 'Null' : 'NotNull' }}
             | &nbsp;&nbsp;&nbsp;
-            input(v-model.trim='mainField', v-on:change='saveMainField', type="radio", v-bind:value="field.name")
+            input(v-model='isChecked', v-on:change='saveMainField', type="radio", v-bind:value="field.name")
         span.help-block(v-if='$v.mainField.$error && !$v.mainField.required') You must choose main unique field
     br
     br
