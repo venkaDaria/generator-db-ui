@@ -9,7 +9,6 @@ public final class Paths {
     public static final String OLD_PACKAGE = OLD_PACKAGE_FIRST + "/example/venka/lab5";
     public static final String OLD_PACKAGE_POINT = "com.example.venka.lab5";
     public static final String MODEL = "/model/impl";
-    public static final String MODEL_POINT = ".model.impl";
     public static final String CRUD_REPOSITORY = "org/springframework/data/repository/CrudRepository";
     public static final String REPOSITORIES = "/repositories";
     public static final String CONTROLLERS = "/controllers/impl";

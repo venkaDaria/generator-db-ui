@@ -6,15 +6,15 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = false, exclude = { "bbb" })
-public class Aaa extends BaseEntity
+@EqualsAndHashCode(callSuper = false, exclude = { "sdfsff" })
+public class Fdsad extends BaseEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String aaa;
-    private String bbb;
+    private int bbb;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bbb_id")
-    private Bbb bbb;
+    @JoinColumn(name = "sdfsff_id")
+    private Sdfsff sdfsff;
 }

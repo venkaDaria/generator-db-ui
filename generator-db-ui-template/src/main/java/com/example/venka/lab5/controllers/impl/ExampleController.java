@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+[import2]
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class ExampleController extends BaseController<Example> {
     }
 
     @PostMapping({"/{id}", "/"})
-    public String savePost(final Model model, @PathVariable final Optional<Long> id[params]) {
+    public String savePost(final Model model, @PathVariable final Optional<Long> id[params][deps-params]) {
         final Example example = create([params-create]);
 
         id.ifPresent(example::setId);

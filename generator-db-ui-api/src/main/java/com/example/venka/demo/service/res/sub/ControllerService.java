@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import static com.example.venka.demo.service.asm.AsmBoundService.applyOption;
@@ -22,14 +23,13 @@ import static com.example.venka.demo.utils.JsonMapper.filterBounds;
 import static com.example.venka.demo.utils.JsonMapper.filterFields;
 import static com.example.venka.demo.utils.Paths.CONTROLLERS;
 import static com.example.venka.demo.utils.Paths.EXAMPLE_CONTROLLER;
-import static com.example.venka.demo.utils.Paths.MODEL_POINT;
 import static com.example.venka.demo.utils.Paths.OLD_PACKAGE_POINT;
 
 @Service
 public class ControllerService implements ServiceExecutor {
 
-    private static final String MANY_BOUND = "%s.get%ss().add(%s)";
-    private static final String ONE_BOUND = "%s.set%s(%s)";
+    private static final String MANY_BOUND = "%s.get%sSet().add(%s)";
+    private static final String ONE_BOUND = "%s.set%sSet(%s)";
 
     @Override
     public void execute(final File directory, final Map<java.lang.String, Object> body) throws IOException {
@@ -69,23 +69,64 @@ public class ControllerService implements ServiceExecutor {
             final List<LinkedTreeMap<String, Object>> fields,
             final List<LinkedTreeMap<String, Object>> bounds
     ) throws IOException {
-        final String fileName = newController.getFileName().toString().replace(".java", "");
+        final String fileName = newController.getFileName().toString()
+                .replace(".java", "").replace("Controller", "");
 
         replace(newController, Replaces.FIELDS, getFields(fileName, bounds));
         replace(newController, Replaces.CONSTRUCTOR, getConstructor(fileName, bounds));
         replace(newController, Replaces.CONSTRUCTOR_FIELDS, getConstructorFields(fileName, bounds));
         replace(newController, Replaces.PARAMS, getParams(fields));
         replace(newController, Replaces.PARAMS_CREATE, getParamsCreate(fields));
+        replace(newController, Replaces.DEPS_PARAMS, getDepsParams(fileName, bounds));
         replace(newController, Replaces.CREATE, getCreate(fileName, fields));
         replace(newController, Replaces.DEPS_STREAM, getDepsStream(fileName, bounds));
         replace(newController, Replaces.DEPS, getDeps(fileName, bounds));
         replace(newController, Replaces.IMPORT, getImport(fileName, packageName, bounds));
+        replace(newController, Replaces.IMPORT_2, getImport2(fields));
+    }
+
+    private String getDepsParams(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
+        final StringBuilder sb = new StringBuilder();
+        bounds.forEach(bound -> {
+            final String bind = bound.get("bind").toString();
+            final String option = applyOption(className.toLowerCase(), bound);
+
+            sb.append(", ").append("final long");
+
+            switch (bind) {
+                case "0":
+                case "1":
+                    sb.append("... ").append(option).append("Set");
+                    break;
+                case "2":
+                case "3":
+                    sb.append(Replaces.SPACE).append(option);
+                    break;
+            }
+        });
+        return sb.toString();
     }
 
     private String getImport(final String className, final String packageName, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("import ").append(packageName)
-                .append(MODEL_POINT).append(Replaces.POINT).append(StringUtils.capitalize(option))
-                .append(";").append(System.lineSeparator()));
+            .append(".repositories.").append(StringUtils.capitalize(option)).append(";"));
+    }
+
+    private String getImport2(final List<LinkedTreeMap<String, Object>> fields) {
+        final StringBuilder sb = new StringBuilder();
+        fields.forEach(field -> createFieldImport(sb, field));
+        return sb.toString();
+    }
+
+    private void createFieldImport(final StringBuilder sb, final LinkedTreeMap<String, Object> field) {
+        final String dataType = field.get("dataType").toString();
+        switch (dataType) {
+            case "LocalDateTime":
+                sb.append("import java.time.LocalDate;").append(System.lineSeparator());
+            case "DateTime":
+                sb.append("import java.time.LocalDateTime;").append(System.lineSeparator());
+                break;
+        }
     }
 
     private static String getStringWithConsumer(
@@ -100,7 +141,7 @@ public class ControllerService implements ServiceExecutor {
     }
 
     private static String getRepository(final String className, final LinkedTreeMap<String, Object> bound) {
-        return applyOption(className.replace("Controller", "").toLowerCase(), bound) + "Repository";
+        return applyOption(className.toLowerCase(), bound) + "Repository";
     }
 
     private static String getStringWithConsumer(
@@ -113,7 +154,11 @@ public class ControllerService implements ServiceExecutor {
     }
 
     private String getDeps(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
-        return getStringWithConsumer(className, bounds, (sb, option) -> sb.append(", ").append(option));
+        return ", new String[]{" +
+                getStringWithConsumer(className, bounds, (stb, option) ->
+                        stb.append(", \"").append(option.replace("Repository", "Set")).append("\""))
+                        .substring(2) + "}, " +
+                getStringWithConsumer(className, bounds, (stb, option) -> stb.append(", ").append(option)).substring(2);
     }
 
     private String getDepsStream(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
@@ -126,30 +171,18 @@ public class ControllerService implements ServiceExecutor {
 
             switch (bind) {
                 case "0":
-                    setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                case "2":
+                    setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption,
+                            Objects.equals(bound.get("option1"), classNameLowerCase) ? ONE_BOUND : MANY_BOUND);
                     break;
                 case "1":
-                    setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption);
-                    break;
-                case "2":
-                    setManyToOneBound(sb, classNameLowerCase, className, option, capitalizeOption);
-                    break;
                 case "3":
-                    setManyToManyBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption,
+                            Objects.equals(bound.get("option1"), classNameLowerCase) ? ONE_BOUND : MANY_BOUND);
                     break;
             }
         });
         return sb.toString();
-    }
-
-    private void setManyToManyBound(final StringBuilder sb, final String classNameLowerCase,
-                                    final String className, final String option, final String capitalizeOption) {
-        setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption, MANY_BOUND);
-    }
-
-    private void setOneToManyBound(final StringBuilder sb, final String classNameLowerCase,
-                                    final String className, final String option, final String capitalizeOption) {
-        setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption, ONE_BOUND);
     }
 
     private void setOneToManyBound(final StringBuilder sb, final String classNameLowerCase,
@@ -157,28 +190,17 @@ public class ControllerService implements ServiceExecutor {
                                    final String stringFormat) {
         sb.append(String.format("Arrays.stream(%1$ss).forEach(%1$sId -> %1$sRepository.findById(%1$sId)", option))
                 .append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(
+        sb.append(Replaces.START_TAB).append(
                 String.format(".ifPresent(%s -> {", option)
         ).append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(Replaces.TAB).append(
-                String.format("%s.get%s().add(%s);", classNameLowerCase, capitalizeOption, option)
-        ).append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(Replaces.TAB).append(
+        sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
+                String.format("%s.get%sSet().add(%s);", classNameLowerCase, capitalizeOption, option)
+        ).append(Replaces.STOP).append(System.lineSeparator());
+        sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
                 String.format(stringFormat, option, className, classNameLowerCase)
-        ).append(System.lineSeparator());
-        sb.append(Replaces.TAB).append("}").append(System.lineSeparator());
-        sb.append("));").append(System.lineSeparator());
-    }
-
-    private void setManyToOneBound(final StringBuilder sb, final String classNameLowerCase,
-                                   final String className, final String option, final String capitalizeOption) {
-        setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption, "%s.get%ss().add(%s)");
-    }
-
-
-    private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
-                                  final String className, final String option, final String capitalizeOption) {
-        setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption, "%s.set%s(%s)");
+        ).append(Replaces.STOP).append(System.lineSeparator());
+        sb.append(Replaces.START_TAB).append("}").append(System.lineSeparator());
+        sb.append(Replaces.START_TAB).append("));");
     }
 
     private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
@@ -186,39 +208,43 @@ public class ControllerService implements ServiceExecutor {
                                   final String stringFormat) {
         sb.append(String.format("%1$sRepository.findById(%1$s).ifPresent(%1$sEntity -> {", option))
                 .append(System.lineSeparator());
-        sb.append(Replaces.TAB).append("model.addAttribute(\"isOkay\");").append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(
-                String.format(stringFormat, classNameLowerCase, capitalizeOption, option)
+        sb.append(Replaces.START_TAB).append(Replaces.TAB).append("model.addAttribute(\"isOkay\");")
+                .append(System.lineSeparator());
+
+        final String optionEntity = option + "Entity";
+
+        sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
+                String.format(stringFormat, classNameLowerCase, capitalizeOption, optionEntity)
+        ).append(Replaces.STOP).append(System.lineSeparator());
+        sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
+                String.format("%s.set%s(%s)", optionEntity, className, classNameLowerCase)
+        ).append(Replaces.STOP).append(System.lineSeparator());
+        sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
+                String.format("%sRepository.save(%s);", option, optionEntity)
         ).append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(
-                String.format("%s.set%s(%s)", option, className, classNameLowerCase)
-        ).append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(
-                String.format("%1$sRepository.save(%1$s);", option)
-        ).append(System.lineSeparator());
-        sb.append("});").append(System.lineSeparator());
+        sb.append(Replaces.START_TAB).append("});");
     }
 
     private String getCreate(final String className, final List<LinkedTreeMap<String, Object>> fields) {
         final StringBuilder sb = new StringBuilder();
         sb.append("private ").append(className).append(" create(").append(getParams(fields).substring(2)).append(") {")
                 .append(System.lineSeparator());
-        sb.append(Replaces.TAB).append(className).append(Replaces.SPACE).append(className.toLowerCase()).append(Replaces.SPACE)
+        sb.append(Replaces.START_TAB).append(className).append(Replaces.SPACE).append(className.toLowerCase()).append(Replaces.SPACE)
                 .append(Replaces.EQUAL).append("new ").append(className).append("()").append(Replaces.STOP)
                 .append(System.lineSeparator());
         sb.append(System.lineSeparator());
 
-        fields.forEach(field -> createFieldSetter(className, sb, field));
+        fields.forEach(field -> createFieldSetter(className.toLowerCase(), sb, field));
 
         sb.append(System.lineSeparator());
-        sb.append(Replaces.TAB).append("return ").append(className.toLowerCase()).append(Replaces.STOP)
+        sb.append(Replaces.START_TAB).append("return ").append(className.toLowerCase()).append(Replaces.STOP)
                 .append(System.lineSeparator());
         sb.append("}");
         return sb.toString();
     }
 
     private void createFieldSetter(final String className, final StringBuilder sb, final LinkedTreeMap<String, Object> field) {
-        String newTab = Replaces.TAB;
+        String newTab = Replaces.START_TAB;
         String value = field.get("name").toString();
 
         final String dataType = field.get("dataType").toString();
@@ -235,7 +261,7 @@ public class ControllerService implements ServiceExecutor {
 
         final boolean throwException = !dataType.equals("String");
         if (throwException) {
-            sb.append(Replaces.TAB).append("try {").append(System.lineSeparator());
+            sb.append(Replaces.START_TAB).append("try {").append(System.lineSeparator());
             newTab += Replaces.TAB;
         }
 
@@ -245,13 +271,13 @@ public class ControllerService implements ServiceExecutor {
                 .append(System.lineSeparator());
 
         if (throwException) {
-            sb.append(Replaces.TAB).append("} catch (final Exception ignored) {").append(System.lineSeparator());
-            sb.append(Replaces.TAB).append("}").append(System.lineSeparator());
+            sb.append(Replaces.START_TAB).append("} catch (final Exception ignored) {").append(System.lineSeparator());
+            sb.append(Replaces.START_TAB).append("}").append(System.lineSeparator());
         }
     }
 
     private String getParamsCreate(final List<LinkedTreeMap<String, Object>> fields) {
-        return getStringWithConsumer(fields, (sb, field) -> sb.append(", ").append(field.get("name").toString()));
+        return getStringWithConsumer(fields, (sb, field) -> sb.append(", ").append(field.get("name").toString())).substring(2);
     }
 
     private String getParams(final List<LinkedTreeMap<String, Object>> fields) {
@@ -261,7 +287,7 @@ public class ControllerService implements ServiceExecutor {
 
     private String getConstructorFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("this.").append(option)
-                .append(Replaces.EQUAL).append(option).append(Replaces.STOP).append(System.lineSeparator()));
+                .append(Replaces.EQUAL).append(option).append(Replaces.STOP));
     }
 
     private String getConstructor(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
@@ -271,7 +297,6 @@ public class ControllerService implements ServiceExecutor {
 
     private String getFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("private final ")
-                .append(StringUtils.capitalize(option)).append(Replaces.SPACE).append(option)
-                .append(";").append(System.lineSeparator()));
+                .append(StringUtils.capitalize(option)).append(Replaces.SPACE).append(option).append(Replaces.STOP));
     }
 }

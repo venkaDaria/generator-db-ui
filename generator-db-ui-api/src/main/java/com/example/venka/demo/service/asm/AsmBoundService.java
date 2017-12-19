@@ -123,7 +123,8 @@ public class AsmBoundService {
         final FieldVisitor fv;
 
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
-            fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET, toDescription(optionName), null);
+            fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET,
+                    toDescription(Types.SET +  "<" + optionName + ">"), null);
 
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);
             setMainInBound(bound.get("option1"), av);
@@ -149,22 +150,5 @@ public class AsmBoundService {
         }
 
         fv.visitEnd();
-    }
-
-    public String dependencyCreate(final String className, final String packageName,
-                                   final String constructorDescription, final LinkedTreeMap<String, Object> bound) {
-        optionName = applyOption(className.toLowerCase(), bound);
-        final String name = optionName + "Repository";
-        final String desc = "L" + packageName + REPOSITORIES + "/" + name + ";";
-        cw.visitField(ACC_PRIVATE, name, desc, null, null);
-
-        final String constructorDesc = constructorDescription != null ? add(desc, constructorDescription) : "()V";
-
-        final MethodVisitor constructor = cw.visitMethod(ACC_PUBLIC, "<init>",
-                constructorDesc, null, null);
-        constructor.visitFieldInsn(GETFIELD, packageName + CONTROLLERS, name, desc);
-        constructor.visitLdcInsn(desc);
-
-        return constructorDesc;
     }
 }

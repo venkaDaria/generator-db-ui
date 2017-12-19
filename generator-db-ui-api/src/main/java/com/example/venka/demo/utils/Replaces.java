@@ -18,13 +18,16 @@ public final class Replaces {
     public static final String CONSTRUCTOR_FIELDS = "\\[constructor\\-fields\\]";
     public static final String PARAMS = "\\[params\\]";
     public static final String PARAMS_CREATE = "\\[params\\-create\\]";
+    public static final String DEPS_PARAMS = "\\[deps-params\\]";
     public static final String CREATE = "\\[create\\]";
     public static final String DEPS_STREAM = "\\[deps\\-stream\\]";
     public static final String DEPS = "\\[deps\\]";
     public static final String IMPORT = "\\[import\\]";
+    public static final String IMPORT_2 = "\\[import2\\]";
 
     // punctuation
     public static final String TAB = "    ";
+    public static final String START_TAB = TAB + TAB;
     public static final String SPACE = " ";
     public static final String EQUAL = " = ";
     public static final String STOP = ";";
