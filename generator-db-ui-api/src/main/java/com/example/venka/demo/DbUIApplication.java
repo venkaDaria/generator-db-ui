@@ -11,5 +11,4 @@ public class DbUIApplication {
     }
 }
 
-// TODO: check work, см. последнюю редакцию ДБ - Вт
-// TODO: front, more validate - Ср
+// TODO: isMain, more validate, см. последнюю редакцию ДБ - Ср

@@ -5,6 +5,7 @@ public final class Paths {
     public static final String PROPERTIES = "/src/main/resources/application.properties";
     /* packages */
     public static final String MAIN_PACKAGE = "/src/main/java";
+    public static final String TEMP_NAME = "generator-db-ui-template-temp";
     public static final String OLD_PACKAGE_FIRST = "/com";
     public static final String OLD_PACKAGE = OLD_PACKAGE_FIRST + "/example/venka/lab5";
     public static final String OLD_PACKAGE_POINT = "com.example.venka.lab5";

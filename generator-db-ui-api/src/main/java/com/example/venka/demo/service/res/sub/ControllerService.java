@@ -31,12 +31,35 @@ public class ControllerService implements ServiceExecutor {
     private static final String MANY_BOUND = "%s.get%sSet().add(%s)";
     private static final String ONE_BOUND = "%s.set%sSet(%s)";
 
+    private static String getStringWithConsumer(
+            final String className,
+            final List<LinkedTreeMap<String, Object>> bounds,
+            final BiConsumer<StringBuilder, String> consumer
+    ) {
+        return getStringWithConsumer(bounds, (StringBuilder sb, LinkedTreeMap<String, Object> bound) -> {
+            final String option = getRepository(className, bound);
+            consumer.accept(sb, option);
+        });
+    }
+
+    private static String getRepository(final String className, final LinkedTreeMap<String, Object> bound) {
+        return applyOption(className.toLowerCase(), bound) + "Repository";
+    }
+
+    private static String getStringWithConsumer(
+            final List<LinkedTreeMap<String, Object>> linkedTreeMapList,
+            final BiConsumer<StringBuilder, LinkedTreeMap<String, Object>> consumer
+    ) {
+        final StringBuilder sb = new StringBuilder();
+        linkedTreeMapList.forEach(linkedTreeMap -> consumer.accept(sb, linkedTreeMap));
+        return sb.toString();
+    }
+
     @Override
     public void execute(final File directory, final Map<java.lang.String, Object> body) throws IOException {
         final Path exampleController = Paths.get(directory.getPath() + EXAMPLE_CONTROLLER);
 
-        @SuppressWarnings("unchecked")
-        final List<LinkedTreeMap<String, Object>> entities =
+        @SuppressWarnings("unchecked") final List<LinkedTreeMap<String, Object>> entities =
                 (ArrayList<LinkedTreeMap<String, Object>>) body.get("entities");
 
         entities.forEach(entity -> {
@@ -109,7 +132,7 @@ public class ControllerService implements ServiceExecutor {
 
     private String getImport(final String className, final String packageName, final List<LinkedTreeMap<String, Object>> bounds) {
         return getStringWithConsumer(className, bounds, (sb, option) -> sb.append("import ").append(packageName)
-            .append(".repositories.").append(StringUtils.capitalize(option)).append(";"));
+                .append(".repositories.").append(StringUtils.capitalize(option)).append(";"));
     }
 
     private String getImport2(final List<LinkedTreeMap<String, Object>> fields) {
@@ -127,30 +150,6 @@ public class ControllerService implements ServiceExecutor {
                 sb.append("import java.time.LocalDateTime;").append(System.lineSeparator());
                 break;
         }
-    }
-
-    private static String getStringWithConsumer(
-            final String className,
-            final List<LinkedTreeMap<String, Object>> bounds,
-            final BiConsumer<StringBuilder, String> consumer
-    ) {
-        return getStringWithConsumer(bounds, (StringBuilder sb, LinkedTreeMap<String, Object> bound) -> {
-            final String option = getRepository(className, bound);
-            consumer.accept(sb, option);
-        });
-    }
-
-    private static String getRepository(final String className, final LinkedTreeMap<String, Object> bound) {
-        return applyOption(className.toLowerCase(), bound) + "Repository";
-    }
-
-    private static String getStringWithConsumer(
-            final List<LinkedTreeMap<String, Object>> linkedTreeMapList,
-            final BiConsumer<StringBuilder, LinkedTreeMap<String, Object>> consumer
-    ) {
-        final StringBuilder sb = new StringBuilder();
-        linkedTreeMapList.forEach(linkedTreeMap -> consumer.accept(sb, linkedTreeMap));
-        return sb.toString();
     }
 
     private String getDeps(final String className, final List<LinkedTreeMap<String, Object>> bounds) {

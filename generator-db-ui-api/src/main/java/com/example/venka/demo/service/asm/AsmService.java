@@ -23,8 +23,9 @@ import static com.example.venka.demo.utils.Types.STR_SUPPLIER;
 import static org.springframework.asm.Opcodes.ACC_INTERFACE;
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
 import static org.springframework.asm.Opcodes.ACC_PUBLIC;
-import static org.springframework.asm.Opcodes.ALOAD;
 import static org.springframework.asm.Opcodes.GETFIELD;
+import static org.springframework.asm.Opcodes.ILOAD;
+import static org.springframework.asm.Opcodes.INVOKESTATIC;
 import static org.springframework.asm.Opcodes.IRETURN;
 import static org.springframework.asm.Opcodes.V1_8;
 
@@ -86,19 +87,20 @@ public class AsmService {
     private void createMethods(final ClassWriter cw, final String fullClassName, final LinkedTreeMap<String, Object> field) {
         MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "getName", STR_SUPPLIER, null, null);
         mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
+        mv.visitVarInsn(ILOAD, 0);
         mv.visitFieldInsn(GETFIELD, fullClassName, field.get("name").toString(), getDescription(field));
+        mv.visitMethodInsn(INVOKESTATIC, "org/thymeleaf/util/StringUtils", "toString",
+                "(Ljava/lang/Object;)Ljava/lang/String;", false);
         mv.visitInsn(IRETURN);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(2, 1);
         mv.visitEnd();
 
         mv = cw.visitMethod(ACC_PUBLIC, "toString", STR_SUPPLIER, null, null);
         mv.visitAnnotation("Ljava/lang/annotation/Override;", true);
         mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, fullClassName, field.get("name").toString(), getDescription(field));
+        mv.visitMethodInsn(INVOKESTATIC, "this", "getName", STR_SUPPLIER, false); // why not virtual?
         mv.visitInsn(IRETURN);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(2, 1);
         mv.visitEnd();
     }
 

@@ -24,7 +24,6 @@ public final class JsonMapper {
         return GSON.fromJson(jsonString, type);
     }
 
-
     @SuppressWarnings("unchecked")
     public static List<LinkedTreeMap<String, Object>> filterBounds(final Map<String, Object> body, final String name) {
         return ((ArrayList<LinkedTreeMap<String, Object>>) body.get("bounds"))

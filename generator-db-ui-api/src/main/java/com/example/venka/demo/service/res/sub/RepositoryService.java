@@ -32,7 +32,7 @@ public class RepositoryService implements ServiceExecutor {
 
         entities.forEach(entity -> {
             final String entityName = entity.get("name").toString();
-            byte[] byteCode = asmService.createRepository(entityName, getPackageDir(body));
+            final byte[] byteCode = asmService.createRepository(entityName, getPackageDir(body));
 
             try {
                 writeTo(repositories, entityName + "Repository", byteCode);

@@ -2,11 +2,12 @@ package com.example.venka.demo.service.asm;
 
 import com.example.venka.demo.utils.Types;
 import com.google.gson.internal.LinkedTreeMap;
-import jdk.internal.org.objectweb.asm.Type;
+import jdk.internal.org.objectweb.asm.signature.SignatureVisitor;
+import jdk.internal.org.objectweb.asm.signature.SignatureWriter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.ClassWriter;
 import org.springframework.asm.FieldVisitor;
-import org.springframework.asm.MethodVisitor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -15,21 +16,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static com.example.venka.demo.utils.Paths.CONTROLLERS;
-import static com.example.venka.demo.utils.Paths.REPOSITORIES;
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
-import static org.springframework.asm.Opcodes.ACC_PUBLIC;
-import static org.springframework.asm.Opcodes.GETFIELD;
 
 @Service
 public class AsmBoundService {
 
     private static final String ID = "_id";
+    private final Set<String> options = new HashSet<>();
     private ClassWriter cw;
-
     private String optionName;
-
-    private Set<String> options = new HashSet<>();
 
     private static void setMainInBound(final Object optionName, final AnnotationVisitor av) {
         av.visit("mappedBy", optionName);
@@ -40,8 +35,14 @@ public class AsmBoundService {
         return "L" + StringUtils.capitalize(className) + ";";
     }
 
-    private static String add(String desc, String bound) {
-        return bound.replace(")V", "," + desc + ")V");
+    public static String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
+        if (Objects.equals(bound.get("option1"), className)) {
+            return bound.get("option2").toString();
+        }
+        if (Objects.equals(bound.get("option2"), className)) {
+            return bound.get("option1").toString();
+        }
+        return "";
     }
 
     public void applyClassWriter(final ClassWriter cw) {
@@ -77,17 +78,9 @@ public class AsmBoundService {
         options.add(optionName);
     }
 
-    public static String applyOption(final String className, final LinkedTreeMap<String, Object> bound) {
-        if (Objects.equals(bound.get("option1"), className)) {
-            return bound.get("option2").toString();
-        }
-        if (Objects.equals(bound.get("option2"), className)) {
-            return bound.get("option1").toString();
-        }
-        return "";
-    }
-
     private void manyToManyCreate(final LinkedTreeMap<String, Object> bound) {
+        optionName = optionName + "Set";
+
         final FieldVisitor fv;
 
         if (Objects.equals(bound.get("option2"), optionName)) {
@@ -100,8 +93,9 @@ public class AsmBoundService {
             fv = cw.visitField(ACC_PRIVATE, optionName, toDescription(optionName),
                     null, null);
             fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true);
-            AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/JoinTable;", true);
-            av.visit("name", optionName + bound.get("option2"));
+
+            final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/JoinTable;", true);
+            av.visit("name", bound.get("option2") + "Set");
             av.visitAnnotation("joinColumns", "Ljavax/persistence/JoinColumn;")
                     .visit("name", optionName + ID);
             av.visitAnnotation("inverseJoinColumns", "Ljavax/persistence/JoinColumn;")
@@ -124,7 +118,8 @@ public class AsmBoundService {
 
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
             fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET,
-                    toDescription(Types.SET +  "<" + optionName + ">"), null);
+                    getSignature(optionName), null);
+            optionName = optionName + "Set";
 
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);
             setMainInBound(bound.get("option1"), av);
@@ -138,6 +133,22 @@ public class AsmBoundService {
         }
 
         fv.visitEnd();
+    }
+
+    @NotNull
+    private String getSignature(final String name) {
+        final SignatureWriter signature = new SignatureWriter();
+
+        final SignatureVisitor superclassSignature = signature.visitSuperclass();
+        superclassSignature.visitClassType("java/util/Set");
+
+        final SignatureVisitor genericSignature = superclassSignature.visitTypeArgument('=');
+        genericSignature.visitClassType(StringUtils.capitalize(name));
+        genericSignature.visitEnd();
+
+        superclassSignature.visitEnd();
+
+        return signature.toString();
     }
 
     private void oneToOneCreate(final LinkedTreeMap<String, Object> bound) {

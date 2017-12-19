@@ -2,6 +2,7 @@ package com.example.venka.demo.controller;
 
 import com.example.venka.demo.service.GeneratorFiles;
 import com.example.venka.demo.utils.zip.ZipManager;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Controller;
 import spark.Request;
 import spark.Response;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.util.Map;
 
 import static com.example.venka.demo.utils.JsonMapper.toMap;
+import static com.example.venka.demo.utils.Paths.TEMP_NAME;
 import static spark.Spark.before;
 import static spark.Spark.options;
 import static spark.Spark.post;
@@ -25,7 +27,14 @@ public class HelloSparkController {
             final Map<String, Object> body = toMap(request.body());
             final File directory = generatorFiles.get(body);
 
-            return app.create(directory);
+            final byte[] result = app.create(directory);
+
+            final boolean isOkay = directory.renameTo(new File(TEMP_NAME));
+            if (isOkay) {
+                FileUtils.deleteDirectory(directory);
+            }
+
+            return result;
         });
 
         enableCORS();

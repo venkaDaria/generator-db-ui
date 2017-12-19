@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public final class FileUtils {
-
-    private static final String PATH_TO_PACKAGE = "generator-db-ui-template-temp.src.main.java.";
 
     private FileUtils() {
         // empty
@@ -24,21 +24,23 @@ public final class FileUtils {
     }
 
     @NotNull
-    public static File createTargetDirectory(File source) throws IOException {
+    public static File createTargetDirectory(final File source, final String name) throws IOException {
         org.apache.commons.io.FileUtils.deleteDirectory(java.nio.file.Paths.get(source.getName() + "-temp").toFile());
-        final File target = Files.createDirectory(Paths.get(source.getName() + "-temp")).toFile();
+        final File target = Files.createDirectory(Paths.get(name)).toFile();
         org.apache.commons.io.FileUtils.copyDirectory(source, target);
         return target;
     }
 
-    public static void writeTo(final File directory, final String name, byte[] bytes) throws IOException {
+    public static void writeTo(final File directory, final String name, final byte[] bytes) throws IOException {
         final Path source = Files.createFile(Paths.get(directory.getPath() + getClassName(name)));
         Files.write(source, bytes);
 
         final Path target = Files.createFile(Paths.get(directory.getPath() + getJavaName(name)));
         DecompilerUtils.execute(source.toFile(), target.toFile());
 
-        replace(target, PATH_TO_PACKAGE, "");
+        final String nonPackage = Arrays.stream(directory.getPath().split("/"))
+                .limit(4).collect(Collectors.joining("/"));
+        replace(target, nonPackage, "");
 
         Files.deleteIfExists(source);
     }

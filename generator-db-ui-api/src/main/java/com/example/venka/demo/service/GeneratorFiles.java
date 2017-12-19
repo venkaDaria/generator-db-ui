@@ -21,12 +21,13 @@ public class GeneratorFiles {
         this.javaCreatorService = javaCreatorService;
     }
 
-    public static String getPackageDir(Map<String, Object> body) {
+    public static String getPackageDir(final Map<String, Object> body) {
         return "/" + body.get("packageName").toString().replace(".", "/");
     }
 
     public File get(final Map<String, Object> body) throws IOException {
-        final File file = createTargetDirectory(new File("generator-db-ui-template"));
+        final File file = createTargetDirectory(new File("generator-db-ui-template"),
+                body.get("name").toString());
 
         templateService.changeFiles(file, body);
         javaCreatorService.createFiles(file, body);

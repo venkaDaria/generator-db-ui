@@ -6,11 +6,10 @@ import java.time.*;
 import java.util.*;
 import javax.persistence.*;
 import java.lang.annotation.*;
-import java.util.HashSet;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = false, exclude = { "fdsad" })
+@EqualsAndHashCode(callSuper = false, exclude = { "fdsadSet" })
 public class Sdfsff extends BaseEntity
 {
     @Id
@@ -19,14 +18,10 @@ public class Sdfsff extends BaseEntity
     private LocalDate ccc;
     private double ddd;
     @OneToMany(mappedBy = "fdsad", cascade = CascadeType.ALL)
-    private HashSet fdsadSet;
+    private Set<Fdsad> fdsadSet;
     
-    public String getName() {
-        return (String)this.ddd;
-    }
+    public String getName();
     
     @Override
-    public String toString() {
-        return (String)this.ddd;
-    }
+    public String toString();
 }
