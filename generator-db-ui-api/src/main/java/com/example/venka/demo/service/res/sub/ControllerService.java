@@ -1,7 +1,10 @@
 package com.example.venka.demo.service.res.sub;
 
 import com.example.venka.demo.utils.Replaces;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.internal.LinkedTreeMap;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
@@ -11,9 +14,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import static com.example.venka.demo.service.asm.AsmBoundService.applyOption;
@@ -21,15 +26,20 @@ import static com.example.venka.demo.utils.FileUtils.getJavaName;
 import static com.example.venka.demo.utils.FileUtils.replace;
 import static com.example.venka.demo.utils.JsonMapper.filterBounds;
 import static com.example.venka.demo.utils.JsonMapper.filterFields;
+import static com.example.venka.demo.utils.JsonMapper.toCode;
 import static com.example.venka.demo.utils.Paths.CONTROLLERS;
+import static com.example.venka.demo.utils.Paths.CONTROLLERS_IMPL;
 import static com.example.venka.demo.utils.Paths.EXAMPLE_CONTROLLER;
 import static com.example.venka.demo.utils.Paths.OLD_PACKAGE_POINT;
+import static com.example.venka.demo.utils.Paths.toHref;
+import static com.example.venka.demo.utils.Replaces.PATHS;
+import static com.example.venka.demo.utils.Replaces.TITLE;
 
 @Service
 public class ControllerService implements ServiceExecutor {
 
     private static final String MANY_BOUND = "%s.get%sSet().add(%s)";
-    private static final String ONE_BOUND = "%s.set%sSet(%s)";
+    private static final String ONE_BOUND = "%s.set%s(%s)";
 
     private static String getStringWithConsumer(
             final String className,
@@ -62,11 +72,17 @@ public class ControllerService implements ServiceExecutor {
         @SuppressWarnings("unchecked") final List<LinkedTreeMap<String, Object>> entities =
                 (ArrayList<LinkedTreeMap<String, Object>>) body.get("entities");
 
+        final Set<JsonObject> paths = new HashSet<>();
         entities.forEach(entity -> {
             final String entityName = entity.get("name").toString();
             final String packageName = body.get("packageName").toString();
             final String className = StringUtils.capitalize(entityName);
-            final String fullClassName = directory.getPath() + CONTROLLERS + getJavaName(className + "Controller");
+            final String fullClassName = directory.getPath() + CONTROLLERS_IMPL + getJavaName(className + "Controller");
+
+            final String jsonString = String.format("{\"name\": %s, \"href\": %s}", entityName, toHref(entityName));
+            final JsonObject asJsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
+
+            paths.add(asJsonObject);
 
             try {
                 final Path newController = new File(fullClassName).toPath();
@@ -82,6 +98,12 @@ public class ControllerService implements ServiceExecutor {
                 System.out.println(ex.getMessage());
             }
         });
+
+
+        final Path routeController = new File(directory.getPath() + CONTROLLERS +
+                getJavaName("RouteController")).toPath();
+        replace(routeController, TITLE, "DB - UI" + body.get("name"));
+        replace(routeController, PATHS, toCode(paths));
 
         Files.deleteIfExists(exampleController);
     }
@@ -172,12 +194,12 @@ public class ControllerService implements ServiceExecutor {
                 case "0":
                 case "2":
                     setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption,
-                            Objects.equals(bound.get("option1"), classNameLowerCase) ? ONE_BOUND : MANY_BOUND);
+                            Objects.equals(bound.get("option1"), classNameLowerCase));
                     break;
                 case "1":
                 case "3":
                     setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption,
-                            Objects.equals(bound.get("option1"), classNameLowerCase) ? ONE_BOUND : MANY_BOUND);
+                            Objects.equals(bound.get("option1"), classNameLowerCase));
                     break;
             }
         });
@@ -186,17 +208,17 @@ public class ControllerService implements ServiceExecutor {
 
     private void setOneToManyBound(final StringBuilder sb, final String classNameLowerCase,
                                    final String className, final String option, final String capitalizeOption,
-                                   final String stringFormat) {
-        sb.append(String.format("Arrays.stream(%1$ss).forEach(%1$sId -> %1$sRepository.findById(%1$sId)", option))
+                                   final boolean isOkay) {
+        sb.append(String.format("Arrays.stream(%1$sSet).forEach(%1$sId -> %1$sRepository.findById(%1$sId)", option))
                 .append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(
                 String.format(".ifPresent(%s -> {", option)
         ).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format("%s.get%sSet().add(%s);", classNameLowerCase, capitalizeOption, option)
+                String.format(isOkay ? ONE_BOUND : MANY_BOUND, classNameLowerCase, capitalizeOption, option)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format(stringFormat, option, className, classNameLowerCase)
+                String.format(isOkay ? MANY_BOUND : ONE_BOUND, option, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append("}").append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append("));");
@@ -204,7 +226,7 @@ public class ControllerService implements ServiceExecutor {
 
     private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
                                   final String className, final String option, final String capitalizeOption,
-                                  final String stringFormat) {
+                                  final boolean isOkay) {
         sb.append(String.format("%1$sRepository.findById(%1$s).ifPresent(%1$sEntity -> {", option))
                 .append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append("model.addAttribute(\"isOkay\");")
@@ -213,10 +235,10 @@ public class ControllerService implements ServiceExecutor {
         final String optionEntity = option + "Entity";
 
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format(stringFormat, classNameLowerCase, capitalizeOption, optionEntity)
+                String.format(isOkay ? ONE_BOUND : MANY_BOUND, classNameLowerCase, capitalizeOption, optionEntity)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format("%s.set%s(%s)", optionEntity, className, classNameLowerCase)
+                String.format(isOkay ? MANY_BOUND : ONE_BOUND, optionEntity, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
                 String.format("%sRepository.save(%s);", option, optionEntity)

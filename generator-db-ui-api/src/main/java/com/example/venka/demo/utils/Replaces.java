@@ -3,6 +3,8 @@ package com.example.venka.demo.utils;
 public final class Replaces {
 
     // UI
+    public static final String TITLE = "\\[title\\]";
+    public static final String PATHS = "\\[paths\\]";
     public static final String FOOTER = "\\[footer\\]";
     public static final String HEADER = "\\[header\\]";
     public static final String USERNAME = "\\[username\\]";

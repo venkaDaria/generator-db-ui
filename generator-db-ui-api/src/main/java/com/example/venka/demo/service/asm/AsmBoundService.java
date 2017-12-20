@@ -122,7 +122,7 @@ public class AsmBoundService {
             optionName = optionName + "Set";
 
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);
-            setMainInBound(bound.get("option1"), av);
+            setMainInBound(reversed.test(true) ? bound.get("option1") : bound.get("option2"), av);
         } else {
             fv = cw.visitField(ACC_PRIVATE, optionName, toDescription(optionName),
                     null, null);

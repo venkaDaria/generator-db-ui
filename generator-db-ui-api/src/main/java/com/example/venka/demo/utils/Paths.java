@@ -1,5 +1,7 @@
 package com.example.venka.demo.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class Paths {
 
     public static final String PROPERTIES = "/src/main/resources/application.properties";
@@ -12,8 +14,9 @@ public final class Paths {
     public static final String MODEL = "/model/impl";
     public static final String CRUD_REPOSITORY = "org/springframework/data/repository/CrudRepository";
     public static final String REPOSITORIES = "/repositories";
-    public static final String CONTROLLERS = "/controllers/impl";
-    public static final String EXAMPLE_CONTROLLER = CONTROLLERS + "/ExampleController.java";
+    public static final String CONTROLLERS = "/controllers";
+    public static final String CONTROLLERS_IMPL = CONTROLLERS + "/impl";
+    public static final String EXAMPLE_CONTROLLER = CONTROLLERS_IMPL + "/ExampleController.java";
     /* UI */
     private static final String TEMPLATES = "/src/main/resources/templates/fragments";
     public static final String FOOTER = TEMPLATES + "/footer.html";
@@ -21,5 +24,9 @@ public final class Paths {
 
     private Paths() {
         // empty
+    }
+
+    public static String toHref(final String entityName) {
+        return "'/" + entityName + "/'";
     }
 }
