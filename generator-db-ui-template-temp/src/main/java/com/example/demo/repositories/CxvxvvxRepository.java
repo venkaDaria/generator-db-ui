@@ -3,6 +3,6 @@ package com.example.demo.repositories;
 import org.springframework.data.repository.*;
 import com.example.demo.model.impl.*;
 
-public interface SdfsRepository extends CrudRepository<Sdfs, Long>
+public interface CxvxvvxRepository extends CrudRepository<Cxvxvvx, Long>
 {
 }

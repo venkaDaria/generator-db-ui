@@ -135,16 +135,10 @@ public class ControllerService implements ServiceExecutor {
         final String classNameLowerCase = className.toLowerCase();
 
         bounds.forEach(bound -> {
-            String bind = bound.get("bind").toString();
-
-            if (Objects.equals(bound.get("option2"), classNameLowerCase)) {
-                bind = bind.equals("1") ? "2" : bind.equals("2") ? "1" : bind;
-            }
-
+            final String bind = getRealBind(classNameLowerCase, bound);
             final String option = applyOption(className.toLowerCase(), bound);
 
             sb.append(", @RequestParam(required = false) final Long");
-
             switch (bind) {
                 case "0":
                 case "2":
@@ -157,6 +151,13 @@ public class ControllerService implements ServiceExecutor {
             }
         });
         return sb.toString();
+    }
+
+    private String getRealBind(final String classNameLowerCase, final LinkedTreeMap<String, Object> bound) {
+        final String bind = bound.get("bind").toString();
+
+        return (Objects.equals(bound.get("option2"), classNameLowerCase)) ?
+                bind.equals("1") ? "2" : bind.equals("2") ? "1" : bind : bind;
     }
 
     private String getImport(final String className, final String packageName, final List<LinkedTreeMap<String, Object>> bounds) {
@@ -173,9 +174,9 @@ public class ControllerService implements ServiceExecutor {
     private void createFieldImport(final StringBuilder sb, final LinkedTreeMap<String, Object> field) {
         final String dataType = field.get("dataType").toString();
         switch (dataType) {
-            case "LocalDateTime":
+            case "LocalDate":
                 sb.append("import java.time.LocalDate;").append(System.lineSeparator());
-            case "DateTime":
+            case "LocalDateTime":
                 sb.append("import java.time.LocalDateTime;").append(System.lineSeparator());
                 break;
         }
@@ -183,9 +184,19 @@ public class ControllerService implements ServiceExecutor {
 
     private String getDeps(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         return ", new String[]{" +
-                getStringWithConsumer(className, bounds, (stb, option) ->
-                        stb.append(", \"").append(option.replace("Repository", "")).append("\""))
-                        .substring(2) + "}, " +
+                getStringWithConsumer(bounds, (stb, bound) -> {
+                    final String classNameLowerCase = className.toLowerCase();
+                    final String option = applyOption(classNameLowerCase, bound);
+
+                    stb.append(", \"").append(option);
+
+                    String bind = getRealBind(classNameLowerCase, bound);
+                    if (bind.equals("1") || bind.equals("3")) {
+                        stb.append("Set");
+                    }
+
+                    stb.append("\"");
+                }).substring(2) + "}, " +
                 getStringWithConsumer(className, bounds, (stb, option) -> stb.append(", ").append(option)).substring(2);
     }
 
@@ -195,12 +206,7 @@ public class ControllerService implements ServiceExecutor {
             final String classNameLowerCase = className.toLowerCase();
             final String option = applyOption(classNameLowerCase, bound);
             final String capitalizeOption = StringUtils.capitalize(option);
-
-            String bind = bound.get("bind").toString();
-
-            if (Objects.equals(bound.get("option2"), classNameLowerCase)) {
-                bind = bind.equals("1") ? "2" : bind.equals("2") ? "1" : bind;
-            }
+            final String bind = getRealBind(classNameLowerCase, bound);
 
             switch (bind) {
                 case "0":
@@ -243,7 +249,7 @@ public class ControllerService implements ServiceExecutor {
     private void setToManyBound(final StringBuilder sb, final String classNameLowerCase,
                                 final String className, final String option, final String capitalizeOption,
                                 final boolean isFirstMany) {
-        sb.append(String.format("if (%s != null) {", option))
+        sb.append(String.format("if (%sSet != null) {", option))
                 .append(System.lineSeparator());
 
         sb.append(Replaces.START_TAB_2).append(
@@ -253,14 +259,14 @@ public class ControllerService implements ServiceExecutor {
                 String.format(".ifPresent(%s -> {", option)
         ).append(System.lineSeparator());
         sb.append(Replaces.START_TAB_2).append(Replaces.TAB).append(
-                String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, classNameLowerCase, capitalizeOption, option)
+                String.format(MANY_BOUND, classNameLowerCase, capitalizeOption, option)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB_2).append(Replaces.TAB).append(
-                String.format(MANY_BOUND, option, className, classNameLowerCase)
+                String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, option, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB_2).append("}").append(System.lineSeparator());
         sb.append(Replaces.START_TAB_2).append("));").append(System.lineSeparator());
-        sb.append(Replaces.START_TAB_2).append("}");
+        sb.append(Replaces.START_TAB).append("}");
     }
 
     private void setToOneBound(final StringBuilder sb, final String classNameLowerCase,
@@ -278,14 +284,14 @@ public class ControllerService implements ServiceExecutor {
         final String optionEntity = option + "Entity";
 
         sb.append(Replaces.START_TAB_2).append(Replaces.TAB).append(
-                String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, classNameLowerCase, capitalizeOption, optionEntity)
+                String.format(ONE_BOUND, classNameLowerCase, capitalizeOption, optionEntity)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB_2).append(Replaces.TAB).append(
-                String.format(ONE_BOUND, optionEntity, className, classNameLowerCase)
+                String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, optionEntity, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB_2).append("});").append(System.lineSeparator());
 
-        sb.append(Replaces.START_TAB_2).append("}");
+        sb.append(Replaces.START_TAB).append("}");
     }
 
     private String getCreate(final String className, final List<LinkedTreeMap<String, Object>> fields) {
@@ -315,15 +321,16 @@ public class ControllerService implements ServiceExecutor {
         switch (dataType) {
             case "Integer":
             case "Double":
-                value = dataType + ".valueOf(" + value + ")";
+                break;
+            case "LocalDate":
+                value = "DateTransformer.parse(" + value + ")";
                 break;
             case "LocalDateTime":
-            case "DateTime":
-                value = "DateTransformer.parse(" + value + ")";
+                value = "DateTransformer.parseWithTime(" + value + ")";
                 break;
         }
 
-        final boolean throwException = !dataType.equals("String");
+        final boolean throwException = isThrowException(dataType);
         if (throwException) {
             sb.append(Replaces.START_TAB).append("try {").append(System.lineSeparator());
             newTab += Replaces.TAB;
@@ -340,13 +347,22 @@ public class ControllerService implements ServiceExecutor {
         }
     }
 
+    private static boolean isThrowException(final String dataType) {
+        return dataType.equals("LocalDate") || dataType.equals("LocalDateTime");
+    }
+
     private String getParamsCreate(final List<LinkedTreeMap<String, Object>> fields) {
         return getStringWithConsumer(fields, (sb, field) -> sb.append(", ").append(field.get("name").toString())).substring(2);
     }
 
     private String getParams(final List<LinkedTreeMap<String, Object>> fields) {
         return getStringWithConsumer(fields, (sb, field) -> sb.append(", @RequestParam ").append("final ")
-                .append(field.get("dataType").toString()).append(" ").append(field.get("name").toString()));
+                .append(getDataType(field)).append(" ").append(field.get("name").toString()));
+    }
+
+    private static String getDataType(final LinkedTreeMap<String, Object> field) {
+        final String dataType = field.get("dataType").toString();
+        return (isThrowException(dataType)) ? "String" : dataType;
     }
 
     private String getConstructorFields(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
