@@ -79,29 +79,27 @@ public class AsmBoundService {
     }
 
     private void manyToManyCreate(final LinkedTreeMap<String, Object> bound) {
-        optionName = optionName + "Set";
-
         final FieldVisitor fv;
 
+        fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET, getSignature(optionName), null);
+        final AnnotationVisitor avBound = fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true);
+
         if (Objects.equals(bound.get("option2"), optionName)) {
-            optionName = optionName + "Set";
-
-            fv = cw.visitField(ACC_PRIVATE, optionName, Types.SET, toDescription(optionName), null);
-            fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true)
-                    .visit("mappedBy", bound.get("option1") + "Set");
+            avBound.visit("mappedBy", bound.get("option1") + "Set");
         } else {
-            fv = cw.visitField(ACC_PRIVATE, optionName, toDescription(optionName),
-                    null, null);
-            fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true);
-
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/JoinTable;", true);
-            av.visit("name", bound.get("option2") + "Set");
-            av.visitAnnotation("joinColumns", "Ljavax/persistence/JoinColumn;")
-                    .visit("name", optionName + ID);
+            av.visit("name", bound.get("option2") + "_" + bound.get("option1"));
+
+            final AnnotationVisitor subAv = av.visitAnnotation("joinColumns", "Ljavax/persistence/JoinColumn;");
+            subAv.visit("name", optionName + ID);
+            subAv.visitEnd();
+
             av.visitAnnotation("inverseJoinColumns", "Ljavax/persistence/JoinColumn;")
                     .visit("name", bound.get("option2") + ID);
+            av.visitEnd();
         }
 
+        optionName = optionName + "Set";
         fv.visitEnd();
     }
 

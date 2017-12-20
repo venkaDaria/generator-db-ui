@@ -11,4 +11,4 @@ public class DbUIApplication {
     }
 }
 
-// TODO: null - notnull, check work, checked; validate, см. ДБ - Ср
+// TODO: checked isMain, check work; validate, см. ДБ - Ср

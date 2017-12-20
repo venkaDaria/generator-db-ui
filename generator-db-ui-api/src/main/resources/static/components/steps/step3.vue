@@ -48,7 +48,7 @@
                         parent: this.nowEntity,
                         name: this.nameField,
                         dataType: this.dataType,
-                        isNull: this.isNull
+                        isNull: this.mainField === this.nameField ? false : this.isNull
                     });
                 } else {
 

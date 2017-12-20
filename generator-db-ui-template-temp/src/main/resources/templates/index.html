@@ -11,8 +11,7 @@
 
     <main class="container">
         <div class="list-group">
-            <a th:each="path : ${paths}" th:href="${path.get('href').getAsString()}"
-               th:text="${path.get('name').getAsString()}" class="list-group-item"></a>
+            <a th:each="path : ${paths}" th:href="${path.href}" th:text="${path.name}" class="list-group-item"></a>
         </div>
     </main>
 

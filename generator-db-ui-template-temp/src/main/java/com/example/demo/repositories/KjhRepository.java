@@ -3,6 +3,6 @@ package com.example.demo.repositories;
 import org.springframework.data.repository.*;
 import com.example.demo.model.impl.*;
 
-public interface AsdadRepository extends CrudRepository<Asdad, Long>
+public interface KjhRepository extends CrudRepository<Kjh, Long>
 {
 }

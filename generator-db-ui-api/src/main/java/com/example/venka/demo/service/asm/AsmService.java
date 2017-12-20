@@ -76,13 +76,26 @@ public class AsmService {
     }
 
     private void executeField(final ClassWriter cw, final String fullClassName, final LinkedTreeMap<String, Object> field) {
-        cw.visitField(ACC_PRIVATE, field.get("name").toString(), getDescription(field),
-                null, null).visitEnd();
+        final FieldVisitor fv = cw.visitField(ACC_PRIVATE, field.get("name").toString(), getDescription(field),
+                null, null);
+
+        final boolean isNotNull = !Boolean.valueOf(String.valueOf(field.get("isNull")));
+        if (isNotNull) {
+            createNotNullableAnnotation(fv);
+        }
+
+        fv.visitEnd();
 
         final Object isMain = field.get("isMain");
         if (isMain != null && Boolean.valueOf(isMain.toString())) {
             createMethods(cw, fullClassName, field);
         }
+    }
+
+    private void createNotNullableAnnotation(final FieldVisitor fv) {
+        final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/Column;", true);
+        av.visit("nullable", false);
+        av.visitEnd();
     }
 
     private void createMethods(final ClassWriter cw, final String fullClassName, final LinkedTreeMap<String, Object> field) {

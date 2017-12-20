@@ -4,7 +4,6 @@ import com.example.venka.demo.utils.Replaces;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.LinkedTreeMap;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
@@ -132,20 +131,27 @@ public class ControllerService implements ServiceExecutor {
 
     private String getDepsParams(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         final StringBuilder sb = new StringBuilder();
+        final String classNameLowerCase = className.toLowerCase();
+
         bounds.forEach(bound -> {
-            final String bind = bound.get("bind").toString();
+            String bind = bound.get("bind").toString();
+
+            if (Objects.equals(bound.get("option2"), classNameLowerCase)) {
+                bind = bind.equals("1") ? "2" : bind.equals("2") ? "1" : bind;
+            }
+
             final String option = applyOption(className.toLowerCase(), bound);
 
             sb.append(", ").append("final long");
 
             switch (bind) {
                 case "0":
-                case "1":
-                    sb.append("... ").append(option).append("Set");
-                    break;
                 case "2":
-                case "3":
                     sb.append(Replaces.SPACE).append(option);
+                    break;
+                case "1":
+                case "3":
+                    sb.append("... ").append(option).append("Set");
                     break;
             }
         });
@@ -185,48 +191,75 @@ public class ControllerService implements ServiceExecutor {
     private String getDepsStream(final String className, final List<LinkedTreeMap<String, Object>> bounds) {
         final StringBuilder sb = new StringBuilder();
         bounds.forEach(bound -> {
-            final String bind = bound.get("bind").toString();
             final String classNameLowerCase = className.toLowerCase();
             final String option = applyOption(classNameLowerCase, bound);
             final String capitalizeOption = StringUtils.capitalize(option);
 
+            String bind = bound.get("bind").toString();
+
+            if (Objects.equals(bound.get("option2"), classNameLowerCase)) {
+                bind = bind.equals("1") ? "2" : bind.equals("2") ? "1" : bind;
+            }
+
             switch (bind) {
                 case "0":
-                case "2":
-                    setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption,
-                            Objects.equals(bound.get("option1"), classNameLowerCase));
+                    setOneToOneBound(sb, classNameLowerCase, className, option, capitalizeOption);
                     break;
                 case "1":
+                    setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    break;
+                case "2":
+                    setManyToOneBound(sb, classNameLowerCase, className, option, capitalizeOption);
+                    break;
                 case "3":
-                    setOneToManyBound(sb, classNameLowerCase, className, option, capitalizeOption,
-                            Objects.equals(bound.get("option1"), classNameLowerCase));
+                    setManyToManyBound(sb, classNameLowerCase, className, option, capitalizeOption);
                     break;
             }
         });
         return sb.toString();
     }
 
+    private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
+                                  final String className, final String option, final String capitalizeOption) {
+        setToOneBound(sb, classNameLowerCase, className, option, capitalizeOption, false);
+    }
+
     private void setOneToManyBound(final StringBuilder sb, final String classNameLowerCase,
-                                   final String className, final String option, final String capitalizeOption,
-                                   final boolean isOkay) {
+                                  final String className, final String option, final String capitalizeOption) {
+        setToManyBound(sb, classNameLowerCase, className, option, capitalizeOption, false);
+    }
+
+    private void setManyToOneBound(final StringBuilder sb, final String classNameLowerCase,
+                                  final String className, final String option, final String capitalizeOption) {
+        setToOneBound(sb, classNameLowerCase, className, option, capitalizeOption, true);
+    }
+
+    private void setManyToManyBound(final StringBuilder sb, final String classNameLowerCase,
+                                  final String className, final String option, final String capitalizeOption) {
+        setToManyBound(sb, classNameLowerCase, className, option, capitalizeOption, true);
+    }
+
+    private void setToManyBound(final StringBuilder sb, final String classNameLowerCase,
+                                final String className, final String option, final String capitalizeOption,
+                                final boolean isFirstMany) {
         sb.append(String.format("Arrays.stream(%1$sSet).forEach(%1$sId -> %1$sRepository.findById(%1$sId)", option))
                 .append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(
                 String.format(".ifPresent(%s -> {", option)
         ).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format(isOkay ? ONE_BOUND : MANY_BOUND, classNameLowerCase, capitalizeOption, option)
+                String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, classNameLowerCase, capitalizeOption, option)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format(isOkay ? MANY_BOUND : ONE_BOUND, option, className, classNameLowerCase)
+                String.format(MANY_BOUND, option, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append("}").append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append("));");
     }
 
-    private void setOneToOneBound(final StringBuilder sb, final String classNameLowerCase,
-                                  final String className, final String option, final String capitalizeOption,
-                                  final boolean isOkay) {
+    private void setToOneBound(final StringBuilder sb, final String classNameLowerCase,
+                               final String className, final String option, final String capitalizeOption,
+                               final boolean isFirstMany) {
         sb.append(String.format("%1$sRepository.findById(%1$s).ifPresent(%1$sEntity -> {", option))
                 .append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append("model.addAttribute(\"isOkay\");")
@@ -235,10 +268,10 @@ public class ControllerService implements ServiceExecutor {
         final String optionEntity = option + "Entity";
 
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format(isOkay ? ONE_BOUND : MANY_BOUND, classNameLowerCase, capitalizeOption, optionEntity)
+                String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, classNameLowerCase, capitalizeOption, optionEntity)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
-                String.format(isOkay ? MANY_BOUND : ONE_BOUND, optionEntity, className, classNameLowerCase)
+                String.format(ONE_BOUND, optionEntity, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append(Replaces.TAB).append(
                 String.format("%sRepository.save(%s);", option, optionEntity)
