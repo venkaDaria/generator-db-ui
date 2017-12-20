@@ -55,7 +55,7 @@ public class CxvxvvxController extends BaseController<Cxvxvvx> {
     }
 
     private Cxvxvvx create(@RequestParam final Double fsdf, @RequestParam final String fsdfvxcx) {
-        final Cxvxvvx cxvxvvx  = new Cxvxvvx();
+        final Cxvxvvx cxvxvvx = new Cxvxvvx();
 
         cxvxvvx.setFsdf(fsdf);
         try {

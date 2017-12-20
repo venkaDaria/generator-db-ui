@@ -24,12 +24,12 @@
                            th:value="${entity?.getFieldValue(header)}" />
                 </div>
 
-                <div th:if="${header.getType().getSimpleName()} == 'Integer'">
+                <div th:if="${header.getType().getSimpleName()} == 'int'">
                     <input type="number" min="0" step="1" th:id="${header.getName()}" th:name="${header.getName()}"
                            class="form-control" th:value="${entity?.getFieldValue(header)}" />
                 </div>
 
-                <div th:if="${header.getType().getSimpleName()} == 'Double'">
+                <div th:if="${header.getType().getSimpleName()} == 'double'">
                     <input type="number" min="0" step="0.01"
                            th:id="${header.getName()}" th:name="${header.getName()}" class="form-control"
                            th:value="${entity?.getFieldValue(header)}" />

@@ -47,8 +47,7 @@ public class FsfddsfsdController extends BaseController<Fsfddsfsd> {
             .ifPresent(cxvxvvx -> {
                 fsfddsfsd.getCxvxvvxSet().add(cxvxvvx);
                 cxvxvvx.setFsfddsfsd(fsfddsfsd);
-            }
-            ));
+            }));
         }
 
         fsfddsfsdRepository.save(fsfddsfsd);
@@ -57,7 +56,7 @@ public class FsfddsfsdController extends BaseController<Fsfddsfsd> {
     }
 
     private Fsfddsfsd create(@RequestParam final String fdsfsfs, @RequestParam final Integer fdsfsfs3erwr, @RequestParam final String vvvxcfd) {
-        final Fsfddsfsd fsfddsfsd  = new Fsfddsfsd();
+        final Fsfddsfsd fsfddsfsd = new Fsfddsfsd();
 
         fsfddsfsd.setFdsfsfs(fdsfsfs);
         fsfddsfsd.setFdsfsfs3erwr(fdsfsfs3erwr);

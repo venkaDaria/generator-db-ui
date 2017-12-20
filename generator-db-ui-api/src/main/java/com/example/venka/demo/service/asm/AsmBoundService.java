@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.ClassWriter;
 import org.springframework.asm.FieldVisitor;
+import org.springframework.asm.MethodVisitor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +18,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
+import static org.springframework.asm.Opcodes.ACC_PUBLIC;
+import static org.springframework.asm.Opcodes.INVOKESPECIAL;
+import static org.springframework.asm.Opcodes.NEW;
+import static org.springframework.asm.Opcodes.PUTFIELD;
+import static org.springframework.asm.Opcodes.PUTSTATIC;
+import static org.springframework.asm.Opcodes.RETURN;
 
 @Service
 public class AsmBoundService {
@@ -79,9 +86,10 @@ public class AsmBoundService {
     }
 
     private void manyToManyCreate(final LinkedTreeMap<String, Object> bound) {
-        final FieldVisitor fv;
+        final FieldVisitor fv = cw.visitField(ACC_PRIVATE, optionName + "Set",
+                Types.SET, getSignature(optionName), null);
+        initialize(optionName);
 
-        fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET, getSignature(optionName), null);
         final AnnotationVisitor avBound = fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true);
 
         if (Objects.equals(bound.get("option2"), optionName)) {
@@ -103,6 +111,17 @@ public class AsmBoundService {
         fv.visitEnd();
     }
 
+    private void initialize(final String type) {
+        final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+        mv.visitCode();
+       // mv.visitTypeInsn(NEW, type);
+       // mv.visitMethodInsn(INVOKESPECIAL, type, "<init>", "()V", false);
+       // mv.visitFieldInsn(PUTFIELD, type, type + "Set", getSignature(type));
+       // mv.visitInsn(RETURN);
+        mv.visitMaxs(0, 0);
+        mv.visitEnd();
+    }
+
     private void oneToManyCreate(final LinkedTreeMap<String, Object> bound) {
         oneToManyCreate(bound, x -> x);
     }
@@ -117,6 +136,7 @@ public class AsmBoundService {
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
             fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET,
                     getSignature(optionName), null);
+            initialize(optionName);
             optionName = optionName + "Set";
 
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);

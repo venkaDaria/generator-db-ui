@@ -264,8 +264,7 @@ public class ControllerService implements ServiceExecutor {
         sb.append(Replaces.START_TAB_2).append(Replaces.TAB).append(
                 String.format(isFirstMany ? MANY_BOUND : ONE_BOUND, option, className, classNameLowerCase)
         ).append(Replaces.STOP).append(System.lineSeparator());
-        sb.append(Replaces.START_TAB_2).append("}").append(System.lineSeparator());
-        sb.append(Replaces.START_TAB_2).append("));").append(System.lineSeparator());
+        sb.append(Replaces.START_TAB_2).append("}));").append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append("}");
     }
 
@@ -299,9 +298,8 @@ public class ControllerService implements ServiceExecutor {
         sb.append("private ").append(className).append(" create(").append(getParams(fields).substring(2)).append(") {")
                 .append(System.lineSeparator());
         sb.append(Replaces.START_TAB).append("final ").append(className).append(Replaces.SPACE)
-                .append(className.toLowerCase()).append(Replaces.SPACE)
-                .append(Replaces.EQUAL).append("new ").append(className).append("()").append(Replaces.STOP)
-                .append(System.lineSeparator());
+                .append(className.toLowerCase()).append(Replaces.EQUAL).append("new ")
+                .append(className).append("()").append(Replaces.STOP).append(System.lineSeparator());
         sb.append(System.lineSeparator());
 
         fields.forEach(field -> createFieldSetter(className.toLowerCase(), sb, field));

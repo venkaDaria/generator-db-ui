@@ -30,4 +30,6 @@ public class Fsfddsfsd extends BaseEntity
     public String toString() {
         return this.getName();
     }
+    
+    public Fsfddsfsd();
 }
