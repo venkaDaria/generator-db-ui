@@ -30,7 +30,7 @@ public class ExampleController extends BaseController<Example> {
 
     @GetMapping("/")
     public String getAll(final Model model) {
-        setAttributes(model, exampleRepository, getClass());
+        setAttributes(model, exampleRepository, Example.class);
         return "table";
     }
 
@@ -43,7 +43,7 @@ public class ExampleController extends BaseController<Example> {
         [deps-stream]
 
         exampleRepository.save(example);
-        setAttributes(model, exampleRepository, getClass());
+        setAttributes(model, exampleRepository, Example.class);
         return "redirect:/example/";
     }
 
@@ -51,14 +51,14 @@ public class ExampleController extends BaseController<Example> {
 
     @GetMapping({"/save/{id}", "/save"})
     public String saveGet(final Model model, @PathVariable final Optional<Long> id) {
-        return super.save(model, id, getClass(), exampleRepository[deps]);
+        return super.save(model, id, Example.class, exampleRepository[deps]);
     }
 
     @PostMapping("/rm/{id}")
     public String delete(final Model model, @PathVariable final long id) {
         exampleRepository.deleteById(id);
 
-        setAttributes(model, exampleRepository, getClass());
+        setAttributes(model, exampleRepository, Example.class);
         return "redirect:/example/";
     }
 

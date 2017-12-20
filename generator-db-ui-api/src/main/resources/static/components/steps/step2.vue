@@ -33,6 +33,9 @@
                 } else {
 
                 }
+            },
+            remove(index) {
+                this.entities.splice(index, 1);
             }
         }
     }

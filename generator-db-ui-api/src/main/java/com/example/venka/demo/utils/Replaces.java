@@ -30,13 +30,11 @@ public final class Replaces {
     // punctuation
     public static final String TAB = "    ";
     public static final String START_TAB = TAB + TAB;
+    public static final String START_TAB_2 = START_TAB + TAB;
     public static final String SPACE = " ";
     public static final String EQUAL = " = ";
     public static final String STOP = ";";
     public static final String POINT = ".";
-
-    // keywords
-    public static final String FINAL = ", final ";
 
     private Replaces() {
         // empty

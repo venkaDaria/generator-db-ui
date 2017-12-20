@@ -3,6 +3,6 @@ package com.example.demo.repositories;
 import org.springframework.data.repository.*;
 import com.example.demo.model.impl.*;
 
-public interface DxfghRepository extends CrudRepository<Dxfgh, Long>
+public interface SdfsfsfRepository extends CrudRepository<Sdfsfsf, Long>
 {
 }

@@ -24,7 +24,6 @@
                 minLength: minLength(3)
             },
             mainField: {
-                required
             },
             nowEntity: {
                 required
@@ -53,17 +52,21 @@
                 } else {
 
                 }
-            }, saveMainField() {
+            },
+            remove(index) {
+                this.fields.splice(index, 1);
+            },
+            saveMainField() {
                 let isOkay = this.validate();
                 if (isOkay) {
                     this.fields.filter(field => field.parent === this.nowEntity).forEach(field => {
                         field['isMain'] = field.name === this.mainField;
-                    })
+                    });
                 } else {
 
                 }
-            }, isChecked() {
-                return this.fields.find(field => field.name === this.mainField).isMain;
+            }, checked() {
+                this.mainField = this.fields.find(field => field.parent === this.nowEntity && field.isMain).name;
             }
         }
     }

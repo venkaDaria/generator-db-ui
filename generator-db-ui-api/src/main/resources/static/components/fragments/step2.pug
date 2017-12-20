@@ -1,7 +1,9 @@
 div
     ul#entities
-    li(v-for='entity in entities')
+    li(v-for='(entity, index) in entities')
         | {{ entity.name }}
+        | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        input(v-on:click='remove(index)', type = 'button', value='Remove', class="btn btn-link")
     br
     br
     .form-group(v-bind:class="{ 'has-error': $v.nameEntity.$error }")
@@ -10,3 +12,4 @@ div
         span.help-block(v-if='$v.nameEntity.$error && !$v.nameEntity.required') Name is required
     br
     input.btn.btn-info(type='button', v-on:click='addEntity', value='Add Entity')
+
