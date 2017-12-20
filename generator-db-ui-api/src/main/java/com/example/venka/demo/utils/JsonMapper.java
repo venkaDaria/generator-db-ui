@@ -58,6 +58,7 @@ public final class JsonMapper {
                     .append(System.lineSeparator());
             sb.append(START_TAB).append(String.format("%sObject.addProperty(\"href\", \"%s\");", name,
                     path.get("href").getAsString())).append(System.lineSeparator());
+            sb.append(START_TAB).append(String.format("PATHS.add(%sObject);", name)).append(System.lineSeparator());
         });
 
         return sb.toString();
