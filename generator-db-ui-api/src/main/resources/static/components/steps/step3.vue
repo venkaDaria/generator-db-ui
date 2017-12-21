@@ -5,7 +5,10 @@
 <script>
     import { required, minLength } from 'vuelidate/lib/validators'
     import ValidateMixin from "../../js/utils/mixin";
-    import firstNotNumber from "../../js/utils/patterns"
+
+    function firstNotNumber(value) {
+        return /^[a-zA-Z].*$/.test(value)
+    }
 
     export default {
         name: 'step3',

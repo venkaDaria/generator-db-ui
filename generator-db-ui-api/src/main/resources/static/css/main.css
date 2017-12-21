@@ -30,3 +30,7 @@ header, footer {
     min-width: 100% !important;
     padding: 1em 8em !important;
 }
+
+.help-block {
+    font-size: 10pt;
+}

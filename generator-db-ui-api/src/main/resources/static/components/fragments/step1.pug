@@ -13,6 +13,7 @@
                 input#groupId.form-control(tabindex='4', type='text',
                 name='groupId', v-model.trim='groupId', @input='$v.groupId.$touch()')
                 span.help-block(v-if='$v.groupId.$error && !$v.groupId.required') groupId is required
+                span.help-block(v-if='$v.groupId.$error && !$v.groupId.firstNotNumber') First symbol must not be number
             .form-group(v-bind:class="{ 'has-error': $v.artifactId.$error }")
                 label.control-label(for='artifactId') Artifact
                 input#artifactId.form-control(tabindex='5', type='text',

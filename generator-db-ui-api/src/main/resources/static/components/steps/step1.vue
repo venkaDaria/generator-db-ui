@@ -4,7 +4,10 @@
 
 <script>
     import { required } from 'vuelidate/lib/validators'
-    import firstNotNumber from "../../js/utils/patterns"
+
+    function firstNotNumber(value) {
+        return /^[a-zA-Z].*$/.test(value)
+    }
 
     export default {
         name: 'step1',
