@@ -13,15 +13,15 @@ public class RouteController {
     private static final Set<JsonObject> PATHS = new HashSet<>();
 
     static {
-        final JsonObject fsfddsfsdObject = new JsonObject();
-        fsfddsfsdObject.addProperty("name", "fsfddsfsd");
-        fsfddsfsdObject.addProperty("href", "/fsfddsfsd/");
-        PATHS.add(fsfddsfsdObject);
+        final JsonObject dadsadasdObject = new JsonObject();
+        dadsadasdObject.addProperty("name", "dadsadasd");
+        dadsadasdObject.addProperty("href", "/dadsadasd/");
+        PATHS.add(dadsadasdObject);
 
-        final JsonObject cxvxvvxObject = new JsonObject();
-        cxvxvvxObject.addProperty("name", "cxvxvvx");
-        cxvxvvxObject.addProperty("href", "/cxvxvvx/");
-        PATHS.add(cxvxvvxObject);
+        final JsonObject dadsaObject = new JsonObject();
+        dadsaObject.addProperty("name", "dadsa");
+        dadsaObject.addProperty("href", "/dadsa/");
+        PATHS.add(dadsaObject);
 }
 
     @RequestMapping("/")

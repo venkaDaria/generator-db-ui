@@ -6,24 +6,35 @@ import jdk.internal.org.objectweb.asm.signature.SignatureVisitor;
 import jdk.internal.org.objectweb.asm.signature.SignatureWriter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.asm.AnnotationVisitor;
+import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.ClassWriter;
 import org.springframework.asm.FieldVisitor;
 import org.springframework.asm.MethodVisitor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.example.venka.demo.utils.Types.STR_SUPPLIER;
 import static org.springframework.asm.Opcodes.ACC_PRIVATE;
 import static org.springframework.asm.Opcodes.ACC_PUBLIC;
+import static org.springframework.asm.Opcodes.ALOAD;
+import static org.springframework.asm.Opcodes.ARETURN;
+import static org.springframework.asm.Opcodes.DUP;
+import static org.springframework.asm.Opcodes.GETFIELD;
 import static org.springframework.asm.Opcodes.INVOKESPECIAL;
+import static org.springframework.asm.Opcodes.INVOKESTATIC;
 import static org.springframework.asm.Opcodes.NEW;
 import static org.springframework.asm.Opcodes.PUTFIELD;
 import static org.springframework.asm.Opcodes.PUTSTATIC;
 import static org.springframework.asm.Opcodes.RETURN;
+import static org.springframework.asm.Type.getDescriptor;
+import static org.springframework.asm.Type.getInternalName;
 
 @Service
 public class AsmBoundService {
@@ -32,6 +43,7 @@ public class AsmBoundService {
     private final Set<String> options = new HashSet<>();
     private ClassWriter cw;
     private String optionName;
+    private String className;
 
     private static void setMainInBound(final Object optionName, final AnnotationVisitor av) {
         av.visit("mappedBy", optionName);
@@ -66,6 +78,7 @@ public class AsmBoundService {
 
     public void createField(final String className, final LinkedTreeMap<String, Object> bound) {
         optionName = applyOption(className.toLowerCase(), bound);
+        this.className = className;
 
         switch (bound.get("bind").toString()) {
             case "0":
@@ -88,13 +101,15 @@ public class AsmBoundService {
     private void manyToManyCreate(final LinkedTreeMap<String, Object> bound) {
         final FieldVisitor fv = cw.visitField(ACC_PRIVATE, optionName + "Set",
                 Types.SET, getSignature(optionName), null);
-        initialize(optionName);
+        initialize(optionName, className);
 
         final AnnotationVisitor avBound = fv.visitAnnotation("Ljavax/persistence/ManyToMany;", true);
 
         if (Objects.equals(bound.get("option2"), optionName)) {
             avBound.visit("mappedBy", bound.get("option1") + "Set");
         } else {
+            initialize(optionName, bound.get("option2").toString());
+
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/JoinTable;", true);
             av.visit("name", bound.get("option2") + "_" + bound.get("option1"));
 
@@ -111,14 +126,16 @@ public class AsmBoundService {
         fv.visitEnd();
     }
 
-    private void initialize(final String type) {
+    private void initialize(final String type, final String thisClass) {
         final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
-       // mv.visitTypeInsn(NEW, type);
-       // mv.visitMethodInsn(INVOKESPECIAL, type, "<init>", "()V", false);
-       // mv.visitFieldInsn(PUTFIELD, type, type + "Set", getSignature(type));
-       // mv.visitInsn(RETURN);
-        mv.visitMaxs(0, 0);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitTypeInsn(NEW, getInternalName(HashSet.class));
+        mv.visitInsn(DUP);
+        mv.visitMethodInsn(INVOKESPECIAL, getInternalName(HashSet.class), "<init>", "()V", false);
+        mv.visitFieldInsn(PUTFIELD, thisClass, type + "Set", getSignature(type));
+        mv.visitInsn(RETURN);
+        mv.visitMaxs(4, 2);
         mv.visitEnd();
     }
 
@@ -136,7 +153,7 @@ public class AsmBoundService {
         if (reversed.test(Objects.equals(bound.get("option2"), optionName))) {
             fv = cw.visitField(ACC_PRIVATE, optionName + "Set", Types.SET,
                     getSignature(optionName), null);
-            initialize(optionName);
+            initialize(optionName, className);
             optionName = optionName + "Set";
 
             final AnnotationVisitor av = fv.visitAnnotation("Ljavax/persistence/OneToMany;", true);
@@ -154,7 +171,7 @@ public class AsmBoundService {
     }
 
     @NotNull
-    private String getSignature(final String name) {
+    private static String getSignature(final String name) {
         final SignatureWriter signature = new SignatureWriter();
 
         final SignatureVisitor superclassSignature = signature.visitSuperclass();
@@ -176,6 +193,9 @@ public class AsmBoundService {
 
         if (Objects.equals(bound.get("option2"), optionName)) {
             setMainInBound(bound.get("option1"), av);
+        } else {
+            fv.visitAnnotation("Ljavax/persistence/JoinColumn;", true)
+                    .visit("name", optionName + ID);
         }
 
         fv.visitEnd();

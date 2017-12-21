@@ -47,7 +47,7 @@
                         parent: this.nowEntity,
                         name: this.nameField,
                         dataType: this.dataType,
-                        isNull: this.mainField === this.nameField ? false : this.isNull
+                        isNull: this.isNull
                     });
                 } else {
 
@@ -61,12 +61,16 @@
                 if (isOkay) {
                     this.fields.filter(field => field.parent === this.nowEntity).forEach(field => {
                         field['isMain'] = field.name === this.mainField;
+                        field['isNull'] = field['isMain'] ? false : field['isNull'];
                     });
                 } else {
 
                 }
             }, checked() {
-                this.mainField = this.fields.find(field => field.parent === this.nowEntity && field.isMain).name;
+                let find = this.fields.find(field => field.parent === this.nowEntity && field.isMain);
+                if (find !== undefined) {
+                    this.mainField = find.name;
+                }
             }
         }
     }

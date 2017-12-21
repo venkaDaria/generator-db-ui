@@ -43,3 +43,8 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }
+
+//./gradlew wrapper --gradle-version 4.3.1 or just ./gradlew wrapper
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.3.1'
+}

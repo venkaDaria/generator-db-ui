@@ -25,8 +25,11 @@ public final class FileUtils {
 
     @NotNull
     public static File createTargetDirectory(final File source, final String name) throws IOException {
-        org.apache.commons.io.FileUtils.deleteDirectory(java.nio.file.Paths.get(source.getName() + "-temp").toFile());
+        org.apache.commons.io.FileUtils.deleteDirectory(Paths.get(source.getName() + "-temp").toFile());
+        org.apache.commons.io.FileUtils.deleteDirectory(Paths.get(name).toFile());
+
         final File target = Files.createDirectory(Paths.get(name)).toFile();
+
         org.apache.commons.io.FileUtils.copyDirectory(source, target);
         return target;
     }
