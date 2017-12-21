@@ -10,6 +10,7 @@ div
         label Name
         input.form-control(v-model.trim='nameEntity', @input='$v.nameEntity.$touch()')
         span.help-block(v-if='$v.nameEntity.$error && !$v.nameEntity.required') Name is required
+        span.help-block(v-if='$v.nameEntity.$error && !$v.nameEntity.firstNotNumber') First symbol must not be number
     br
     input.btn.btn-info(type='button', v-on:click='addEntity', value='Add Entity')
 

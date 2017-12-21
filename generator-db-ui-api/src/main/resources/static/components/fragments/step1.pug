@@ -19,6 +19,7 @@
                 input#artifactId.form-control(tabindex='5', type='text',
                     name='artifactId', v-model.trim='artifactId', @input='$v.artifactId.$touch()')
                 span.help-block(v-if='$v.artifactId.$error && !$v.artifactId.required') artifactId is required
+                span.help-block(v-if='$v.artifactId.$error && !$v.artifactId.firstNotNumber') First symbol must not be number
             .form-group(v-bind:class="{ 'has-error': $v.userName.$error }")
                 label.control-label(for='userName') UserName for DB
                 input#userName.form-control(tabindex='5', type='text',
@@ -32,10 +33,12 @@
             .form-group.full.hidden
                 label.control-label(for='name') Name
                 input#name.form-control(tabindex='6', type='text', name='name', v-model.trim='name')
+                span.help-block(v-if='$v.name.$error && !$v.name.firstNotNumber') First symbol must not be number
             .form-group.full.hidden
                 label.control-label(for='packageName') Package Name
                 input#packageName.form-control(tabindex='8', type='text',
                     name='packageName', v-model.trim='packageName')
+                span.help-block(v-if='$v.packageName.$error && !$v.packageName.firstNotNumber') First symbol must not be number
             .form-group.full.hidden
                 label.control-label(for='javaVersion') Java Version
                 select#javaVersion.form-control(tabindex='10', name='javaVersion', v-model.trim='javaVersion')

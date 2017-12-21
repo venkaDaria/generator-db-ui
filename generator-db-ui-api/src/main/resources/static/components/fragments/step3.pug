@@ -19,6 +19,7 @@ div
         label Name
         input.form-control(v-model.trim='nameField', @input='$v.nameField.$touch()')
         span.help-block(v-if='$v.nameField.$error && !$v.nameField.required') Name is required
+        span.help-block(v-if='$v.nameField.$error && !$v.nameField.firstNotNumber') First symbol must not be number
     .form-group(v-bind:class="{ 'has-error': $v.dataType.$error }")
         label DataType
         select.form-control(v-model.trim='dataType', @input='$v.dataType.$touch()')
