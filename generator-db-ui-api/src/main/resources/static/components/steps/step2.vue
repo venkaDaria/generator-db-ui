@@ -5,6 +5,7 @@
 <script>
     import { required, minLength } from 'vuelidate/lib/validators'
     import ValidateMixin from "../../js/utils/mixin";
+    import firstNotNumber from "../../js/utils/patterns"
 
     export default {
         name: 'step2',
@@ -17,8 +18,8 @@
         validations: {
             nameEntity: {
                 required,
-                minLength: minLength(3)
-
+                minLength: minLength(3),
+                firstNotNumber
             },
             form: ['nameEntity']
         },

@@ -4,10 +4,7 @@
 
 <script>
     import { required } from 'vuelidate/lib/validators'
-
-    function patternGroup(value) {
-        return /^[a-zA-Z].*$/.test(value)
-    }
+    import firstNotNumber from "../../js/utils/patterns"
 
     export default {
         name: 'step1',
@@ -29,14 +26,17 @@
         validations: {
             groupId: {
                 required,
-                patternGroup
+                firstNotNumber
             },
             artifactId: {
-                required
+                required,
+                firstNotNumber
             },
             name: {
+                firstNotNumber
             },
             packageName: {
+                firstNotNumber
             },
             javaVersion: {
             },
