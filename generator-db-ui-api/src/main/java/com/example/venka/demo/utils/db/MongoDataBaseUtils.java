@@ -16,4 +16,9 @@ public class MongoDataBaseUtils implements DataBaseUtils {
     public String getDependencies(final String dataBase) {
         return "compile('org.springframework.boot:spring-boot-starter-data-mongodb')";
     }
+
+    @Override
+    public String replaceDataJpa() {
+        return "compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.12.Final'";
+    }
 }

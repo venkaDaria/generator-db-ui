@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.example.venka.demo.service.GeneratorFiles.getPackageDir;
 import static com.example.venka.demo.utils.FileUtils.replace;
@@ -86,5 +87,6 @@ public class TemplateService {
         final Path pathGradle = new File(resultFile.getPath() + "/build.gradle").toPath();
         replace(pathGradle, Replaces.GROUP, "'" + groupId + "'");
         replace(pathGradle, Replaces.COMPILE, dataBaseUtils.getDependencies(dataBase));
+        replace(pathGradle, Pattern.quote(DataBaseUtils.JPA), dataBaseUtils.replaceDataJpa());
     }
 }

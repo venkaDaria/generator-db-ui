@@ -10,5 +10,3 @@ public class DbUIApplication {
         SpringApplication.run(DbUIApplication.class, args);
     }
 }
-
-// TODO: check work

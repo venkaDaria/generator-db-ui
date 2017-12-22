@@ -54,6 +54,8 @@
                         dataType: this.dataType,
                         isNull: this.isNull
                     });
+
+                    this.saveMainField();
                 } else {
 
                 }

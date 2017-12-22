@@ -7,13 +7,13 @@
         main.container
             form-wizard(@on-complete='onComplete', color="#a44040")
                 h2(slot="title") Generate project
-                tab-content(title='Personal details', icon='fa fa-user', :before-change="()=>validateStep('step1')")
+                tab-content(title='Metadata', icon='fa fa-user', :before-change="()=>validateStep('step1')")
                     step1(ref="step1", @on-validate="mergePartialModels")
-                tab-content(title='Additional Info', icon='fa fa-tasks')
+                tab-content(title='Entities', icon='fa fa-tasks')
                     step2(ref="step2", @on-validate="mergePartialModels")
-                tab-content(title='Additional Info', icon='fa fa-address-card')
+                tab-content(title='Fields', icon='fa fa-address-card')
                     step3(ref="step3", @on-validate="mergePartialModels")
-                tab-content(title='Additional Info', icon='fa fa-link')
+                tab-content(title='Bounds', icon='fa fa-link')
                     step4(ref="step4", @on-validate="mergePartialModels")
                 tab-content(title='Last step', icon='fa fa-check')
                     include fragments/step5.pug

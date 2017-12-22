@@ -43,4 +43,4 @@
                 label.control-label(for='javaVersion') Java Version
                 select#javaVersion.form-control(tabindex='10', name='javaVersion', v-model.trim='javaVersion')
                     option(value='1.8', selected) 8
-    label.switcher(v-on:click='switchVersion') Switch to the full version
+    label.switcher(v-on:click='switchVersion') {{ text }}

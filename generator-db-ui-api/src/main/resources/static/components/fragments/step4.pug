@@ -1,7 +1,9 @@
 div
     ul#bounds
-        li(v-for='bound in bounds')
+        li(v-for='(bound, index) in bounds')
             | {{ bound.option1 }} - {{ bound.option2 }} ({{ bound.bind }})
+            | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            input(v-on:click='remove(index)', type = 'button', value='Remove', class="btn btn-link")
     br
     br
     .form-group(v-bind:class="{ 'has-error': $v.option1.$error }")

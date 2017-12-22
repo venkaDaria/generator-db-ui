@@ -66,8 +66,9 @@
                 return isValid
             },
             switchVersion: function () {
-                this.applyParams();
-
+                this.name = this.artifactId;
+                this.packageName = this.groupId  + '.' + this.artifactId;
+                console.log(this.full);
                 this.text = this.full ? 'Switch to the short version' : 'Switch to the full version';
                 this.full = !this.full;
                 $(".full").toggleClass("hidden");

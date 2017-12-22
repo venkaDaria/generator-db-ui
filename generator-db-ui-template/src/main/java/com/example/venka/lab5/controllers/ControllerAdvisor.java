@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ControllerAdvisor {
 
     @ExceptionHandler(PersistentObjectException.class)
-    public String handle(final Exception ex) {
-        return "";
+    public String handle(final Exception ex)  {
+        return "redirect:./";
     }
 }

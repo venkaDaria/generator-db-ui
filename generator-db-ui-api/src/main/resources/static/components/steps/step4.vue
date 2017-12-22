@@ -33,6 +33,9 @@
             entities() {
                 return this.$store.getters.entities;
             },
+            remove(index) {
+                this.bounds.splice(index, 1);
+            },
             addBound() {
                 let isOkay = this.validate();
                 if (isOkay) {
