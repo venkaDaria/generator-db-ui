@@ -87,7 +87,7 @@ public class AsmService {
         fv.visitEnd();
 
         final Object isMain = field.get("isMain");
-        if (isMain != null && Boolean.valueOf(isMain.toString())) {
+        if (isMain != null && Boolean.valueOf(isMain.toString()) || field.get("name").equals("name")) {
             createMethods(cw, fullClassName, field);
         }
     }
